@@ -1,0 +1,227 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(uuid()) @map("_id")
+  name            String?
+  email           String           @unique
+  password        String
+  roles           UserRole[]
+  tunnels         Tunnel[]
+  comments        Comment[]
+  siteInspections SiteInspection[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+}
+
+model Role {
+  id        String     @id @default(uuid()) @map("_id")
+  name      String
+  users     UserRole[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+}
+
+model UserRole {
+  id     String @id @default(uuid()) @map("_id")
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+}
+
+model Site {
+  id             String           @id @default(uuid()) @map("_id")
+  name           String
+  location       String
+  projectManager String
+  startDate      String
+  endDate        String?
+  inspections    SiteInspection[]
+  tunnels        Tunnel[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+}
+
+model Tunnel {
+  id                String              @id @default(uuid()) @map("_id")
+  name              String              @unique
+  supervisorId      String?
+  supervisor        User?               @relation(fields: [supervisorId], references: [id])
+  comments          Comment[]
+  siteId            String
+  dimensions        TunnelDimension[]
+  components        TunnelComponent[]
+  advancements      TunnelAdvancement[]
+  blasts            BlastLog[]
+  incidents         IncidentReport[]
+  manpower          Manpower[]
+  equipment         Equipment[]
+  inspections       SiteInspection[]
+  productionReports ProductionReport[]
+  site              Site                @relation(fields: [siteId], references: [id])
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now()) @updatedAt
+}
+
+model TunnelDimension {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  mainAxisLength    Float
+  gradePercentage   Float
+  designProfileType String
+  heightDimensions  Float
+  widthDimensions   Float
+  crossSectionArea  Float
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model TunnelComponent {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  componentType     String
+  distanceFromEntry String
+  length            String
+  deviationAngle    String
+  widthDimensions   String
+  heightDimensions  String
+  supported         Boolean
+  gradePercentage   String
+  note              String?
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model TunnelAdvancement {
+  id              String   @id @default(uuid()) @map("_id")
+  tunnelId        String
+  crosscutId      String?
+  lengthAdvanced  Float
+  processType     String
+  faceVideoUrl    String?
+  gradePercentage Float
+  note            String?
+  tunnel          Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+}
+
+model BlastLog {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  blastType         String
+  quantity          Int
+  failedBlastsQty   Int
+  delayPattern      String
+  blastPattern      String
+  misfiredBlastsQty Int
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model IncidentReport {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  incidentType      String
+  peopleInvolved    String
+  rootCauseAnalysis String
+  measuresTaken     String
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @map("_id")
+  content   String
+  userId    String
+  tunnelId  String
+  user      User     @relation(fields: [userId], references: [id])
+  tunnel    Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model SiteInspection {
+  id             String      @id @default(uuid()) @map("_id")
+  siteId         String
+  tunnelId       String?
+  shift          String?
+  inspectionDate DateTime
+  manpower       Manpower[]
+  equipment      Equipment[]
+  site           Site        @relation(fields: [siteId], references: [id])
+  tunnel         Tunnel?     @relation(fields: [tunnelId], references: [id])
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now()) @updatedAt
+}
+
+model ProductionReport {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  dailyPlan         Float
+  bookedMeter       Float
+  actualMeter       Float
+  variance          Float
+  materialExcavated Int
+  wasteExcavated    Int
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model Manpower {
+  id               String          @id @default(uuid()) @map("_id")
+  name             String
+  role             String
+  location         String
+  warning          Warning?
+  present          Boolean         @default(false)
+  tunnelId         String
+  tunnel           Tunnel          @relation(fields: [tunnelId], references: [id])
+  siteInspectionId String?
+  siteInspection   SiteInspection? @relation(fields: [siteInspectionId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+}
+
+model Equipment {
+  id               String          @id @default(uuid()) @map("_id")
+  equipment        String
+  number           String
+  location         String
+  warning          Warning?
+  present          Boolean         @default(false)
+  tunnelId         String
+  tunnel           Tunnel          @relation(fields: [tunnelId], references: [id])
+  siteInspectionId String?
+  siteInspection   SiteInspection? @relation(fields: [siteInspectionId], references: [id])
+
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Warning {
+  id          String     @id @default(uuid()) @map("_id")
+  status      Boolean
+  message     String?
+  manpower    Manpower?  @relation(fields: [manpowerId], references: [id])
+  manpowerId  String?    @unique
+  equipment   Equipment? @relation(fields: [equipmentId], references: [id])
+  equipmentId String?    @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+}
