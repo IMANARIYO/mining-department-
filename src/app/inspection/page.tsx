@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTriangle, CheckCircle } from "lucide-react"; 
+import { AlertTriangle, CheckCircle } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -23,20 +23,30 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Calendar } from "@/components/ui/calendar";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { Textarea } from "@/components/ui/textarea";
 
 import CustomSelect from "@/components/CustomSelect";
-import { DatePicker } from "@/components/DatePicker";
+
 import { Label } from "@/components/ui/label";
-import SiteForm from "./AddSiteForm";
+
 import TunnelDimensionForm from "./TunnelDimensionForm";
 import TunnelComponentForm from "./TunnelComponentForm";
 import TunnelAdvancementForm from "./TunnelAdvancementForm";
+import { getSites, getTunnelsBySiteId } from "@/services/siteService";
+import FilterBar from "./minesTunnelsFilterBar";
+import SiteForm from "./siteManagement/SiteForm";
+import IncidentReportForm from "./IncidentReportForm";
+import TunnelDimensionTabs from "./TunnelDimensionTabs";
 
 const TunnelManagementSystem = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [filters, setFilters] = useState({
+    selectedMineSite: null as { id: string; name: string } | null,
+    selectedTunnel: null as { id: string; name: string } | null,
+    selectedShift: null as string | null,
+    selectedDate: undefined as Date | undefined
+  });
+
   const [manpowerData, setManpowerData] = useState([
     {
       id: "1",
@@ -63,7 +73,12 @@ const TunnelManagementSystem = () => {
       present: false
     }
   ]);
-
+  const [mineSites, setMineSites] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [tunnels, setTunnels] = useState<{ value: string; label: string }[]>(
+    []
+  );
   const [equipmentData, setEquipmentData] = useState([
     {
       id: "1",
@@ -82,7 +97,6 @@ const TunnelManagementSystem = () => {
       present: false
     }
   ]);
-  
   const [selectedMineSite, setSelectedMineSite] = useState<string | null>(null);
   const [selectedTunnel, setSelectedTunnel] = useState<string | null>(null);
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
@@ -91,24 +105,27 @@ const TunnelManagementSystem = () => {
   const [selectedProcessType, setSelectedProcessType] = useState("");
   const [selectedBlastType, setSelectedBlastType] = useState("");
   const [incidentType, setIncidentType] = useState("");
-   const [tunnelId, setTunnelId] = useState<string>(
-     "4a48752a-b260-4c99-ab30-f56f0070e4ad"
-   );
-    const handleFormSubmitSuccess = () => {
-      console.log("Tunnel dimension created successfully!");
-      // You can refresh data or take any other action here
-    };
+  const [tunnelId, setTunnelId] = useState<string | undefined>(undefined);
+   
+  useEffect(() => {
+     
+    if (filters.selectedTunnel) {
+      setTunnelId(filters.selectedTunnel.id);
+    } else {
+      setTunnelId(undefined);  
+    }
+  }, [ filters.selectedTunnel]);
+
+  const handleFormSubmitSuccess = () => {
+    console.log("Tunnel dimension created successfully!");
+  };
+
   const [sosPeople, setSosPeople] = useState("");
   const [peopleInvolved, setPeopleInvolved] = useState("");
   const [rootCause, setRootCause] = useState("");
   const [measuresTaken, setMeasuresTaken] = useState("");
   const [comments, setComments] = useState("");
 
-  const mineSites = [
-    { value: "site1", label: "Mine Site 1" },
-    { value: "site2", label: "Mine Site 2" },
-    { value: "site3", label: "Mine Site 3" }
-  ];
   const blastLogColumns: GridColDef[] = [
     { field: "date", headerName: "Date", flex: 1 },
     { field: "time", headerName: "Time", flex: 1 },
@@ -118,16 +135,7 @@ const TunnelManagementSystem = () => {
     { field: "explosive", headerName: "Explosive", flex: 1 },
     { field: "result", headerName: "Result", flex: 1 }
   ];
-  const tunnels = [
-    { value: "tunnel1", label: "Tunnel 1" },
-    { value: "tunnel2", label: "Tunnel 2" },
-    { value: "tunnel3", label: "Tunnel 3" },
-    { value: "tunnel4", label: "Tunnel 4" },
-    { value: "tunnel5", label: "Tunnel 5" },
-    { value: "tunnel6", label: "Tunnel 6" },
-    { value: "tunnel7", label: "Tunnel 7" },
-    { value: "tunnel8", label: "Tunnel 8" }
-  ];
+
   const shifts = [
     { value: "day", label: "Day Shift" },
     { value: "night", label: "Night Shift" }
@@ -136,7 +144,7 @@ const TunnelManagementSystem = () => {
     { value: "fall", label: "Rock Fall" },
     { value: "fire", label: "Fire" }
   ];
-  // Function to toggle presence
+   
   const togglePresence = (id: string, type: "manpower" | "equipment") => {
     if (type === "manpower") {
       setManpowerData((prev) =>
@@ -152,38 +160,38 @@ const TunnelManagementSystem = () => {
       );
     }
   };
-const blastLogRows = [
-  {
-    id: 1,
-    date: "2025-03-08",
-    time: "14:30",
-    tunnel: "Tunnel #1",
-    location: 156.5,
-    pattern: "Burn Cut",
-    explosive: "45.2 kg ANFO",
-    result: "Good",
-  },
-  {
-    id: 2,
-    date: "2025-03-07",
-    time: "15:15",
-    tunnel: "Tunnel #1",
-    location: 152.0,
-    pattern: "Burn Cut",
-    explosive: "43.8 kg ANFO",
-    result: "Excellent",
-  },
-  {
-    id: 3,
-    date: "2025-03-06",
-    time: "14:45",
-    tunnel: "Tunnel #1",
-    location: 146.8,
-    pattern: "Wedge Cut",
-    explosive: "40.5 kg ANFO",
-    result: "Satisfactory",
-  },
-];
+  const blastLogRows = [
+    {
+      id: 1,
+      date: "2025-03-08",
+      time: "14:30",
+      tunnel: "Tunnel #1",
+      location: 156.5,
+      pattern: "Burn Cut",
+      explosive: "45.2 kg ANFO",
+      result: "Good"
+    },
+    {
+      id: 2,
+      date: "2025-03-07",
+      time: "15:15",
+      tunnel: "Tunnel #1",
+      location: 152.0,
+      pattern: "Burn Cut",
+      explosive: "43.8 kg ANFO",
+      result: "Excellent"
+    },
+    {
+      id: 3,
+      date: "2025-03-06",
+      time: "14:45",
+      tunnel: "Tunnel #1",
+      location: 146.8,
+      pattern: "Wedge Cut",
+      explosive: "40.5 kg ANFO",
+      result: "Satisfactory"
+    }
+  ];
 
   const manpowerColumns: GridColDef[] = [
     { field: "id", headerName: "ID", hideable: false, width: 20 },
@@ -193,7 +201,6 @@ const blastLogRows = [
       renderCell: (params) => (
         <div
           style={{
-          
             color: params.value.status ? "black" : "inherit",
             padding: "5px",
             borderRadius: "4px"
@@ -254,13 +261,13 @@ const blastLogRows = [
       )
     }
   ];
-  // Function to allow only numeric input
+   
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      e.target.value = value; // Ensure only numbers
+      e.target.value = value;  
     } else {
-      e.target.value = value.replace(/\D/g, ""); // Remove non-numeric characters
+      e.target.value = value.replace(/\D/g, "");  
     }
   };
   const DataTable = ({
@@ -282,7 +289,7 @@ const blastLogRows = [
         </CardHeader>
         <CardContent>
           <div
-            style={{ height: "100%",width:"100%" }}
+            style={{ height: "100%", width: "100%" }}
             className="max-w-[100%]">
             <DataGrid
               rows={rows}
@@ -296,8 +303,8 @@ const blastLogRows = [
       </Card>
     );
   };
- const [activeTab, setActiveTab] = useState("site-info");
- 
+  const [activeTab, setActiveTab] = useState("site-info");
+
   const tabs = [
     { value: "site-info", label: "Site Informations" },
     { value: "tunnel-dimensions", label: "Create Tunnel Dimensionss" },
@@ -306,20 +313,19 @@ const blastLogRows = [
     { value: "blast-log", label: "Blast Log Detaill" },
     { value: "production", label: "production reporting" }
   ];
-   interface Tab {
-     value: string;
-     label: string;
-   }
-     const handleTabClick = (tabId: string): void => {
-       setActiveTab(tabId);
-     };
+   const tunnelDimensionTabs = [
+     { value: "tunnel-dimensions", label: "Tunnel Dimensions" },
+     { value: "tunnel-components", label: "Tunnel Components" }
+   ];
+
+  interface Tab {
+    value: string;
+    label: string;
+  }
   return (
     <div className="w-full  mx-auto p-2  sm:p-2 space-y-6">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4 w-full">
         <div className="flex items-center gap-4">
-          <Select>
-            <option value="">Select Company</option>
-          </Select>
           <Input className="w-64" placeholder="Search..." />
         </div>
         <div className="flex items-center gap-2">
@@ -332,26 +338,27 @@ const blastLogRows = [
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <CustomSelect
-          options={mineSites}
-          placeholder="Select Mine Site"
-          onChange={(value) => setSelectedMineSite(value)}
-        />
-        <CustomSelect
-          options={tunnels}
-          placeholder="Select Tunnel ID"
-          onChange={(value) => setSelectedTunnel(value)}
-        />
-        <CustomSelect
-          options={shifts}
-          placeholder="Select Shift"
-          onChange={(value) => setSelectedShift(value)}
-        />
-        <div className="relative">
-          <DatePicker onDateChange={(date) => setSelectedDate(date)} />
-        </div>
-      </div>
+      <FilterBar onFilterChange={setFilters} />
+      {/* <div>
+        <h2>Selected Filters:</h2>
+        <p>
+          Mine Site:{" "}
+          {filters.selectedMineSite
+            ? `${filters.selectedMineSite.name} (ID: ${filters.selectedMineSite.id})`
+            : "None"}
+        </p>
+        <p>
+          Tunnel:{" "}
+          {filters.selectedTunnel
+            ? `${filters.selectedTunnel.name} (ID: ${filters.selectedTunnel.id})`
+            : "None"}
+        </p>
+        <p>Shift: {filters.selectedShift || "None"}</p>
+        <p>
+          Date:{" "}
+          {filters.selectedDate ? filters.selectedDate.toDateString() : "None"}
+        </p>
+      </div> */}
       <Tabs defaultValue="site-info" className="w-full">
         <TabsList className="grid w-full grid-cols-1  sm:grid-cols-4 md:grid-cols-6 h-full gap-2">
           {tabs.map((tab) => (
@@ -371,7 +378,7 @@ const blastLogRows = [
         </TabsList>
         <TabsContent value="site-info">
           <SiteForm />
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Site Inspection</CardTitle>
             </CardHeader>
@@ -408,93 +415,22 @@ const blastLogRows = [
                 rows={equipmentData}
               />
             </CardContent>
-          </Card>
+          </Card> */}
         </TabsContent>
         <TabsContent value="tunnel-dimensions">
-          {/* Tunnel Dimensions */}
-          <TunnelDimensionForm
-            tunnelId={tunnelId}
+          <TunnelDimensionTabs
+            tunnelId={tunnelId || ""}
+            handleFormSubmitSuccess={handleFormSubmitSuccess}
+          />
+
+          {/* <TunnelDimensionForm
+            tunnelId={tunnelId || ""}
             onSubmitSuccess={handleFormSubmitSuccess}
           />
-          {/*Tunnel Component*/}
           <TunnelComponentForm
-            tunnelId={tunnelId}
+            tunnelId={tunnelId || ""}
             onSubmitSuccess={handleFormSubmitSuccess}
-          />
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Tunnel Dimensions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-              
-                <Input placeholder="Main Axis length" />
-                <Input placeholder="Grade (%)" />
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Design Profile type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="type1">Type 1</SelectItem>
-                    <SelectItem value="type2">Type 2</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input placeholder="Height dimensions" />
-                <Input placeholder="Width dimensions" />
-                <Input placeholder="Cross-section Area(m2)" />
-              </div>
-            </CardContent>
-          </Card> */}
-
-          {/* <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="text-lg">Tunnel Components</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-
-              <Input
-                className="w-full"
-                placeholder="crosscut, Drift (ID), Raise (ID), Winze (ID), Heading (ID), Siding (ID), Stope (ID)"
-              />
-
-
-              <div className="grid grid-cols-3 gap-4">
-
-                <CustomSelect
-                  options={[
-                    { value: "id1", label: "ID 1" },
-                    { value: "id2", label: "ID 2" }
-                  ]}
-                  placeholder="CrossCut (ID)"
-                  onChange={setSelectedCrossCut}
-                />
-
-
-                <Input placeholder="Distance from main entry (m)" />
-                <Input placeholder="Length dimensions (m)" />
-                <Input placeholder="Deviation angle (degrees)" />
-                <Input placeholder="Width dimensions (m)" />
-                <Input placeholder="Height dimensions (m)" />
-
-
-                <CustomSelect
-                  options={[
-                    { value: "yes", label: "Yes" },
-                    { value: "no", label: "No" }
-                  ]}
-                  placeholder="Supported"
-                  onChange={setSelectedSupport}
-                />
-
-                <Input placeholder="Grade (%)" />
-                <Textarea placeholder="Note" />
-              </div>
-
-              <Button variant="outline" className="ml-auto">
-                Save
-              </Button>
-            </CardContent>
-          </Card> */}
+          /> */}
         </TabsContent>
         <TabsContent value="production">
           <Card>
@@ -524,83 +460,12 @@ const blastLogRows = [
             </CardHeader>
             <CardContent>
               <TunnelAdvancementForm
-               tunnelId={tunnelId}
-            onSubmitSuccess={handleFormSubmitSuccess}/>
-              <form className="space-y-6">
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="advancement-date">Date</Label>
-                      <Input id="advancement-date" type="date" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="tunnel-select">Select Tunnel</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select tunnel" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tunnel-1">Tunnel #1</SelectItem>
-                          <SelectItem value="tunnel-2">Tunnel #2</SelectItem>
-                          <SelectItem value="tunnel-3">Tunnel #3</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="advancement-distance">
-                      Advancement Distance (m)
-                    </Label>
-                    <Input
-                      id="advancement-distance"
-                      type="number"
-                      step="0.1"
-                      placeholder="Enter distance"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="advancement-method">Method Used</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="tbm">
-                          Tunnel Boring Machine (TBM)
-                        </SelectItem>
-                        <SelectItem value="drill-blast">
-                          Drill and Blast
-                        </SelectItem>
-                        <SelectItem value="natm">
-                          New Austrian Tunneling Method
-                        </SelectItem>
-                        <SelectItem value="cut-cover">Cut and Cover</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="advancement-notes">Notes</Label>
-                    <Textarea
-                      id="advancement-notes"
-                      placeholder="Enter notes"
-                      rows={4}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="bg-amber-800 hover:bg-amber-900">
-                  Record Advancement
-                </Button>
-              </form>
+                tunnelId={tunnelId || ""}
+                onSubmitSuccess={handleFormSubmitSuccess}
+              />
 
               <div className="mt-8">
-                <h3 className="text-lg font-medium mb-4">
+                <h3 className="text-lg font-medium mb-4 w-y">
                   Recent Advancements
                 </h3>
                 <div className="rounded-md border">
@@ -833,68 +698,11 @@ const blastLogRows = [
           </Card>
         </TabsContent>
         <TabsContent value="report">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="text-lg">Incident Report</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                {/* Incident Type Select */}
-                <CustomSelect
-                  options={[
-                    { value: "type1", label: "Type 1" },
-                    { value: "type2", label: "Type 2" }
-                  ]}
-                  placeholder="INCIDENT TYPE"
-                  onChange={setIncidentType}
-                />
+          <IncidentReportForm
+            tunnelId={tunnelId || ""}
+            onSubmitSuccess={handleFormSubmitSuccess}
+          />
 
-                {/* Tunnel ID Select */}
-                <CustomSelect
-                  options={[
-                    { value: "id1", label: "ID 1" },
-                    { value: "id2", label: "ID 2" }
-                  ]}
-                  placeholder="TUNNEL ID"
-                  onChange={setTunnelId}
-                />
-
-                {/* SOS People */}
-                <Textarea
-                  placeholder="SOS people"
-                  value={sosPeople}
-                  onChange={(e) => setSosPeople(e.target.value)}
-                />
-
-                {/* Full-Width Textareas */}
-                <Textarea
-                  placeholder="People involved"
-                  className="col-span-3"
-                  value={peopleInvolved}
-                  onChange={(e) => setPeopleInvolved(e.target.value)}
-                />
-
-                <Textarea
-                  placeholder="Root cause analysis"
-                  className="col-span-3"
-                  value={rootCause}
-                  onChange={(e) => setRootCause(e.target.value)}
-                />
-
-                <Textarea
-                  placeholder="Measures taken"
-                  className="col-span-3"
-                  value={measuresTaken}
-                  onChange={(e) => setMeasuresTaken(e.target.value)}
-                />
-              </div>
-
-              {/* Save Button */}
-              <Button variant="outline" className="ml-auto">
-                Save
-              </Button>
-            </CardContent>
-          </Card>
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="text-lg">Additional Comments</CardTitle>

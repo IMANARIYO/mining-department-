@@ -46,7 +46,7 @@ model Site {
   startDate      String
   endDate        String?
   inspections    SiteInspection[]
-  tunnels        Tunnel[]
+  tunnels        Tunnel[] 
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @default(now()) @updatedAt
 }
@@ -56,7 +56,7 @@ model Tunnel {
   name              String              @unique
   supervisorId      String?
   supervisor        User?               @relation(fields: [supervisorId], references: [id])
-  comments          Comment[]
+
   siteId            String
   dimensions        TunnelDimension[]
   components        TunnelComponent[]
@@ -67,7 +67,8 @@ model Tunnel {
   equipment         Equipment[]
   inspections       SiteInspection[]
   productionReports ProductionReport[]
-  site              Site                @relation(fields: [siteId], references: [id])
+  site              Site                @relation(fields: [siteId], references: [id], onDelete: Cascade)
+ 
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @default(now()) @updatedAt
 }
@@ -116,6 +117,29 @@ model TunnelAdvancement {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
 }
+// schema.prisma
+model BlastingPoposed {
+  id                String   @id @default(uuid()) @map("_id")
+  reportId          String
+  dateTime          DateTime @default(now())
+  blastLocation     String
+  blastId           String
+  rockType          String
+  groundStability   String
+  waterPresence     String
+  groundTemperature Float
+  numberOfHoles     Int
+  holeDepth         Float
+  holeDiameter      Float
+  holeCondition     String
+  ventilationPlan   Boolean
+  areaEvacuated     Boolean
+  personnelAccounted Boolean
+  equipmentRemoved  Boolean
+  teamLeadSignature String
+  teamMembers       String[]
+}
+
 
 model BlastLog {
   id                String   @id @default(uuid()) @map("_id")
@@ -138,6 +162,7 @@ model IncidentReport {
   peopleInvolved    String
   rootCauseAnalysis String
   measuresTaken     String
+  comments          Comment[]
   tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
@@ -145,11 +170,11 @@ model IncidentReport {
 
 model Comment {
   id        String   @id @default(uuid()) @map("_id")
-  content   String
-  userId    String
-  tunnelId  String
+content   String
+userId    String
+ incidentReportId  String 
   user      User     @relation(fields: [userId], references: [id])
-  tunnel    Tunnel   @relation(fields: [tunnelId], references: [id])
+  incidentReport    IncidentReport @relation(fields: [incidentReportId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
@@ -210,7 +235,7 @@ model Equipment {
   tunnel           Tunnel          @relation(fields: [tunnelId], references: [id])
   siteInspectionId String?
   siteInspection   SiteInspection? @relation(fields: [siteInspectionId], references: [id])
-
+  createdAt        DateTime        @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 

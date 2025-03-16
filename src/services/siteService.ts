@@ -11,10 +11,26 @@ export const createSite = async (siteData: {
 }) => {
   try {
     const response = await axiosInstance.post(SITE_API_URL, siteData);
+    console.log("site dta sent---------",siteData)
+    console.log("received",response.data)
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.message || "Error creating site";
     throw { error: "Failed to create site", message: message };
+  }
+};
+
+export const getTunnelsBySiteId = async (siteId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${SITE_API_URL}/${siteId}/tunnels`
+    );
+    return response.data;
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message ||
+      `Error fetching tunnels for site with ID: ${siteId}`;
+    throw { error: "Failed to fetch tunnels", message: message };
   }
 };
 
@@ -50,7 +66,7 @@ export const updateSite = async (
   }
 ) => {
   try {
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.patch(
       `${SITE_API_URL}/${siteId}`,
       siteData
     );

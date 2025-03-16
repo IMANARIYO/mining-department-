@@ -1,64 +1,117 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-// ✅ GET Tunnel by ID
-export async function GET(req: NextRequest, context: { params: { tunnelId: string } }) {
-  const { tunnelId } = await Promise.resolve(context.params);
+import Response from "@/lib/Response";
 
+// ✅ GET Tunnel by ID
+export async function GET(
+  req: NextRequest,
+  { params: { tunnelId } }: { params: { tunnelId: string } }
+) {
   try {
     const tunnel = await prisma.tunnel.findUnique({
       where: { id: tunnelId },
-      include: { supervisor: true, comments: true, dimensions: true, components: true, advancements: true, blasts: true, incidents: true },
+      include: {
+        supervisor: true,
+ 
+        dimensions: true,
+        components: true,
+        advancements: true,
+        blasts: true,
+        incidents: true
+      }
     });
 
     if (!tunnel) {
-      return NextResponse.json({ error: "Tunnel not found" }, { status: 404 });
+      return Response.error(
+        404,
+        "Tunnel not found",
+        "The tunnel with the given ID does not exist."
+      );
     }
 
-    return NextResponse.json(tunnel, { status: 200 });
+    return Response.success(200, tunnel, "Tunnel fetched successfully");
   } catch (error) {
     console.error("Error fetching tunnel:", error);
-    return NextResponse.json({ error: "Failed to fetch tunnel" }, { status: 500 });
+    return Response.error(
+      500,
+      "Failed to fetch tunnel",
+      "An error occurred while fetching the tunnel."
+    );
   }
 }
+
 // ✅ UPDATE Tunnel by ID
-export async function PATCH(req: NextRequest, context: { params: { tunnelId: string } }) {
-  const { tunnelId } = await Promise.resolve(context.params);
+export async function PATCH(
+  req: NextRequest,
+  { params: { tunnelId } }: { params: { tunnelId: string } }
+) {
   const { name, supervisorId } = await req.json();
 
   try {
-    const existingTunnel = await prisma.tunnel.findUnique({ where: { id: tunnelId } });
+    const existingTunnel = await prisma.tunnel.findUnique({
+      where: { id: tunnelId }
+    });
     if (!existingTunnel) {
-      return NextResponse.json({ error: "Tunnel not found" }, { status: 404 });
+      return Response.error(
+        404,
+        "Tunnel not found",
+        "The tunnel with the given ID does not exist."
+      );
     }
 
     const updatedTunnel = await prisma.tunnel.update({
       where: { id: tunnelId },
-      data: { name, supervisorId },
+      data: { name, supervisorId }
     });
 
-    return NextResponse.json(updatedTunnel, { status: 200 });
+    return Response.success(200, updatedTunnel, "Tunnel updated successfully");
   } catch (error) {
     console.error("Error updating tunnel:", error);
-    return NextResponse.json({ error: "Failed to update tunnel" }, { status: 500 });
+    return Response.error(
+      500,
+      "Failed to update tunnel",
+      "An error occurred while updating the tunnel."
+    );
   }
 }
 
 // ✅ DELETE Tunnel by ID
-export async function DELETE(req: NextRequest, context: { params: { tunnelId: string } }) {
-  const { tunnelId } = await Promise.resolve(context.params);
-
+export async function DELETE(
+  req: NextRequest,
+  { params: { tunnelId } }: { params: { tunnelId: string } }
+) {
   try {
-    const existingTunnel = await prisma.tunnel.findUnique({ where: { id: tunnelId } });
+    const existingTunnel = await prisma.tunnel.findUnique({
+      where: { id: tunnelId }
+    });
     if (!existingTunnel) {
-      return NextResponse.json({ error: "Tunnel not found" }, { status: 404 });
+      return Response.error(
+        404,
+        "Tunnel not found",
+        "The tunnel with the given ID does not exist."
+      );
     }
 
     await prisma.tunnel.delete({ where: { id: tunnelId } });
 
-    return NextResponse.json({ message: "Tunnel deleted successfully" }, { status: 200 });
+    return Response.success(200, null, "Tunnel deleted successfully");
   } catch (error) {
     console.error("Error deleting tunnel:", error);
-    return NextResponse.json({ error: "Failed to delete tunnel" }, { status: 500 });
+    return Response.error(
+      500,
+      "Failed to delete tunnel",
+      "An error occurred while deleting the tunnel."
+    );
   }
+}
+
+// /lib/Response.ts
+import { NextResponse } from "next/server";
+
+// Interface for the response structure
+interface ResponseData {
+  data?: any;
+  error?: string;
+  message?: string;
 }
 

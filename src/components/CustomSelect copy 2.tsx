@@ -26,16 +26,17 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     value || null
   );
 
-  useEffect(() => {
-         
-    if (options.length > 0 && !selectedValue) {
-      // Set the first option as selected if no value is set
-      setSelectedValue(options[0].value);
-       onChange(options[0].value);
-   
-  
-    }
-  }, [options, selectedValue, onChange]);
+ useEffect(() => {
+   if (value) {
+     setSelectedValue(value);
+   } else if (options.length > 0) {
+     setSelectedValue(options[0].value);
+     onChange(options[0].value); // Notify parent of auto-selection
+   } else {
+     setSelectedValue(null);
+   }
+ }, [value, options, onChange]);
+
 
   return (
     <Select
@@ -52,7 +53,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {options.length >= 0 ? (
+          {options.length > 0 ? (
             options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -15,16 +14,63 @@ import {
 } from "@/components/ui/popover";
 
 export function DatePicker({
-  onDateChange
+  onDateChange,
+  value
 }: {
   onDateChange?: (date: Date | undefined) => void;
+  value?: Date | string;
 }) {
-  const [date, setDate] = React.useState<Date>();
+  // Default to today's date if value is not provided
+  const defaultDate = new Date();
+  defaultDate.setHours(12, 0, 0, 0); // Normalize time to avoid timezone issues
+  // Initialize date state from provided value
+  const [date, setDate] = React.useState<Date | undefined>(() => {
+    if (!value) return defaultDate;
+    if (typeof value === "string") return new Date(value);
+    return value;
+  });
+
+  // Effect to sync props with internal state
+  React.useEffect(() => {
+    if (value) {
+      const valueDate = typeof value === "string" ? new Date(value) : value;
+      setDate(valueDate);
+    }
+  }, [value]);
 
   const handleDateChange = (selectedDate: Date | undefined) => {
-    setDate(selectedDate);
-    if (onDateChange) {
-      onDateChange(selectedDate);
+    if (selectedDate) {
+      // Create normalized date (noon to avoid timezone issues)
+      const normalizedDate = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        12,
+        0,
+        0 // Set time to 12:00:00 to avoid timezone crossover issues
+      );
+
+      setDate(normalizedDate);
+
+      if (onDateChange) {
+        onDateChange(normalizedDate);
+      }
+    } else {
+      setDate(undefined);
+      if (onDateChange) {
+        onDateChange(undefined);
+      }
+    }
+  };
+
+  // Helper to format dates safely
+  const formatDateSafe = (date: Date | undefined) => {
+    if (!date) return "";
+    try {
+      return format(date, "PPP");
+    } catch (e) {
+      console.error("Invalid date format:", e);
+      return "Invalid date";
     }
   };
 
@@ -38,7 +84,7 @@ export function DatePicker({
             !date && "text-muted-foreground"
           )}>
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {date ? formatDateSafe(date) : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
@@ -52,22 +98,3 @@ export function DatePicker({
     </Popover>
   );
 }
-
-// how to use the above  inthe  parent component 
-const TunnelManagementSystem = () => {
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>();
-
-  return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Tunnel Management System</h1>
-
-      {/* Using DatePicker and passing setSelectedDate function */}
-      <DatePicker onDateChange={(date) => setSelectedDate(date)} />
-
-      <p className="mt-4">
-        Selected Date:{" "}
-        {selectedDate ? format(selectedDate, "PPP") : "No date selected"}
-      </p>
-    </div>
-  );
-};
