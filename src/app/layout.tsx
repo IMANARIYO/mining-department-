@@ -5,6 +5,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationMenu } from "../components/navigationmenu";
 import { Header } from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,19 +31,27 @@ export default function Layout({
   return (
     <html lang="en">
       <body
-        className={`  ${geistSans.variable} ${geistMono.variable} antialiased w-full h-screen`}>
-        <SidebarProvider>
-          <div className="flex flex-row h-full w-full">
-            <NavigationMenu />
-            <div className="flex flex-col flex-1 ">
-              <Header />
-              <div className="children  p-4 overflow-auto">
-                {children}
-                <Toaster />
+        className={`  ${geistSans.variable} ${geistMono.variable} antialiased w-full h-screen`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SidebarProvider>
+            <div className="flex flex-row h-full w-full">
+              <NavigationMenu />
+              <div className="flex flex-col flex-1 ">
+                <Header />
+                <div className="children  p-4 overflow-auto">
+                  {children}
+                  <Toaster />
+                </div>
               </div>
             </div>
-          </div>
-        </SidebarProvider>
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
