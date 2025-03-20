@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // CREATE Role (POST)
 export async function POST(req: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     // Check if the role name already exists
     const existingRole = await prisma.role.findFirst({
-      where: { name }
+      where: { name },
     });
 
     if (existingRole) {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Create the new role
     const newRole = await prisma.role.create({
-      data: { name }
+      data: { name },
     });
 
     return NextResponse.json(
@@ -51,16 +51,16 @@ export async function GET(req: NextRequest) {
     const roles = await prisma.role.findMany({
       include: {
         users: {
-          include: { user: true } // Get user details for each role
-        }
-      }
+          include: { user: true }, // Get user details for each role
+        },
+      },
     });
 
     // Map roles to include only relevant user details
     const formattedRoles = roles.map((role) => ({
       id: role.id,
       name: role.name,
-      users: role.users.map((userRole) => userRole.user) // Extract users for each role
+      users: role.users.map((userRole) => userRole.user), // Extract users for each role
     }));
 
     return NextResponse.json({ roles: formattedRoles }, { status: 200 });

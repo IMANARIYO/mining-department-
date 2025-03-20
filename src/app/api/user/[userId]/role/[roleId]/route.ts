@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ ADD ROLE TO USER
 export async function POST(
@@ -11,22 +11,21 @@ export async function POST(
   try {
     // Check if the user already has the role
     const existingUserRole = await prisma.userRole.findUnique({
-      where: { userId_roleId: { userId, roleId } }
+      where: { userId_roleId: { userId, roleId } },
     });
 
     if (existingUserRole) {
-      return NextResponse.json(-
-        { error: "User already has this role" },
-        { status: 400 }
-      );
+      return NextResponse.json(-{ error: "User already has this role" }, {
+        status: 400,
+      });
     }
 
     // Add the new role for the user
     const newUserRole = await prisma.userRole.create({
       data: {
         userId,
-        roleId
-      }
+        roleId,
+      },
     });
 
     return NextResponse.json(
@@ -51,7 +50,7 @@ export async function DELETE(
   try {
     // Remove the role from the user
     const deletedUserRole = await prisma.userRole.delete({
-      where: { userId_roleId: { userId, roleId } }
+      where: { userId_roleId: { userId, roleId } },
     });
 
     return NextResponse.json(
@@ -65,4 +64,3 @@ export async function DELETE(
     );
   }
 }
-

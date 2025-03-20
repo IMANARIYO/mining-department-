@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ CHECK IF USER HAS A SPECIFIC ROLE BY ROLE ID
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
     // Check if any user has the given role
     const usersWithRole = await prisma.userRole.findMany({
       where: { roleId },
-      include: { user: true } // Include user details
+      include: { user: true }, // Include user details
     });
 
     if (usersWithRole.length === 0) {
@@ -30,7 +30,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: "Failed to check role for users",
-        message: (error as Error).message
+        message: (error as Error).message,
       },
       { status: 500 }
     );

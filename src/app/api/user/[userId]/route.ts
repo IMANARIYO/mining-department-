@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ GET USER BY ID
 export async function GET(
@@ -13,8 +13,8 @@ export async function GET(
       where: { id: userId },
       include: {
         roles: { include: { role: true } },
-        tunnels: true
-      }
+        tunnels: true,
+      },
     });
 
     if (!user) {
@@ -44,8 +44,8 @@ export async function PATCH(
       data: {
         ...(name && { name }),
         ...(email && { email }),
-        ...(password && { password })
-      }
+        ...(password && { password }),
+      },
     });
 
     return NextResponse.json(

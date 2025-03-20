@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import Response from "@/lib/Response";
 
 const FIXED_USER_ID = "cb4f936d-27d0-4cdd-bda2-807506f80b58"; // Explicit user ID
@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     const comment = await prisma.comment.create({
       data: {
         ...data,
-        userId: FIXED_USER_ID // Explicitly set user ID
-      }
+        userId: FIXED_USER_ID, // Explicitly set user ID
+      },
     });
 
     return Response.success(201, comment, "Comment created successfully.");

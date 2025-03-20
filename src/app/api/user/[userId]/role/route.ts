@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ GET ROLES FOR USER BY USER ID
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
     // Fetch user with their roles
     const userWithRoles = await prisma.user.findUnique({
       where: { id: userId },
-      include: { roles: { include: { role: true } } } // Include the role details
+      include: { roles: { include: { role: true } } }, // Include the role details
     });
 
     if (!userWithRoles) {
@@ -24,7 +24,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: "Failed to fetch user roles",
-        message: (error as Error).message
+        message: (error as Error).message,
       },
       { status: 500 }
     );

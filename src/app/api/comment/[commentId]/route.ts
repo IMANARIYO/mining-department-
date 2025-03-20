@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import Response from "@/lib/Response";
 
 // Get comment by ID
@@ -11,7 +11,7 @@ export async function GET(
     const { commentId } = context.params;
 
     const comment = await prisma.comment.findUnique({
-      where: { id: commentId }
+      where: { id: commentId },
     });
 
     if (!comment) {
@@ -39,7 +39,7 @@ export async function PATCH(
 
     const updatedComment = await prisma.comment.update({
       where: { id: commentId },
-      data
+      data,
     });
 
     return Response.success(

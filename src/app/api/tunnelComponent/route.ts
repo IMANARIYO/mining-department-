@@ -1,6 +1,6 @@
 // Handle GET request for fetching Tunnel Components
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
+import {prisma} from "@/lib/prisma";
 import Response from "@/lib/Response";
 export async function GET(req: NextRequest) {
  const { tunnelId } = await req.json();

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-
+import { prisma } from "@/lib/prisma";
 
 // ✅ PATCH Tunnel Dimension (update the dimension by dimensionId)
 export async function PATCH(
@@ -20,7 +19,7 @@ export async function PATCH(
   try {
     // ✅ Check if the dimension exists before updating
     const existingDimension = await prisma.tunnelDimension.findUnique({
-      where: { id: dimensionId }
+      where: { id: dimensionId },
     });
 
     if (!existingDimension) {
@@ -45,13 +44,13 @@ export async function PATCH(
     // ✅ Update the tunnel dimension with only provided fields
     const updatedDimension = await prisma.tunnelDimension.update({
       where: { id: dimensionId },
-      data: filteredData
+      data: filteredData,
     });
 
     return NextResponse.json(
       {
         message: "Dimension updated successfully",
-        dimension: updatedDimension
+        dimension: updatedDimension,
       },
       { status: 200 }
     );
@@ -60,7 +59,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         error: "Failed to update tunnel dimension",
-        message: (error as Error).message
+        message: (error as Error).message,
       },
       { status: 500 }
     );
@@ -84,7 +83,7 @@ export async function DELETE(
   try {
     // ✅ Check if the dimension exists before deleting
     const existingDimension = await prisma.tunnelDimension.findUnique({
-      where: { id: dimensionId }
+      where: { id: dimensionId },
     });
 
     if (!existingDimension) {
@@ -96,13 +95,13 @@ export async function DELETE(
 
     // ✅ Delete the tunnel dimension
     const deletedDimension = await prisma.tunnelDimension.delete({
-      where: { id: dimensionId }
+      where: { id: dimensionId },
     });
 
     return NextResponse.json(
       {
         message: "Dimension deleted successfully",
-        dimension: deletedDimension
+        dimension: deletedDimension,
       },
       { status: 200 }
     );
@@ -111,7 +110,7 @@ export async function DELETE(
     return NextResponse.json(
       {
         error: "Failed to delete tunnel dimension",
-        message: (error as Error).message
+        message: (error as Error).message,
       },
       { status: 500 }
     );
@@ -136,7 +135,7 @@ export async function GET(
     // ✅ Fetch the tunnel dimension using its ID
     const tunnelDimension = await prisma.tunnelDimension.findUnique({
       where: { id: dimensionId },
-      include: { tunnel: true }
+      include: { tunnel: true },
     });
 
     if (!tunnelDimension) {
@@ -152,7 +151,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: "Failed to fetch tunnel dimension",
-        message: (error as Error).message
+        message: (error as Error).message,
       },
       { status: 500 }
     );
