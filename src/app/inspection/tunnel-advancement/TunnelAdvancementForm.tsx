@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createTunnelAdvancement } from "@/services/tunnelAdvancementService"; // Import the service for TunnelAdvancement
-import TunnelForm from "@/components/TunnelForm";
+import ReusableForm from "@/components/ReusableForm";
 import { Toaster, toast } from "sonner"; // Using toasts for error/success feedback
 
 interface TunnelAdvancementFormProps {
@@ -12,20 +12,26 @@ const TunnelAdvancementForm: React.FC<TunnelAdvancementFormProps> = ({
   tunnelId,
   onSubmitSuccess
 }) => {
-  const [formData, setFormData] = useState<Record<string, string | number | Date|undefined>>({
+  const [formData, setFormData] = useState<
+    Record<string, string | number | Date | undefined>
+  >({
     tunnelId,
     // advancementDate: "",
     distanceAdvanced: "",
     methodUsed: "",
     notes: ""
   });
-
+  console.log("am receaiving the ", tunnelId);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form validation
   const validateForm = () => {
+    if (!formData.tunnelId) {
+      ("Select tunnel, please.");
+      return "Select tunnel, please.";
+    }
     const requiredFields = [
-    //   { name: "advancementDate", message: "Advancement Date is required" },
+      //   { name: "advancementDate", message: "Advancement Date is required" },
       { name: "distanceAdvanced", message: "Advancement Distance is required" },
       { name: "methodUsed", message: "Method Used is required" },
       { name: "notes", message: "Notes are required" }
@@ -51,7 +57,7 @@ const TunnelAdvancementForm: React.FC<TunnelAdvancementFormProps> = ({
       processType: formData.methodUsed as string,
       gradePercentage: 0, // Assuming a default value, replace with actual value if available
       note: formData.notes as string
-    //   advancementDate: formData.advancementDate
+      //   advancementDate: formData.advancementDate
     };
 
     try {
@@ -92,7 +98,7 @@ const TunnelAdvancementForm: React.FC<TunnelAdvancementFormProps> = ({
   ];
 
   return (
-    <TunnelForm
+    <ReusableForm
       title="Tunnel Advancement"
       fields={tunnelAdvancementFields}
       formData={formData}

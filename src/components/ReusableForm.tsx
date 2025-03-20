@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Toaster, toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/DatePicker";
-interface TunnelFormProps {
+interface ReusableFormProps {
   title: string;
   fields: {
     name: string;
@@ -26,7 +26,7 @@ interface TunnelFormProps {
   validateForm: () => true | string;
 }
 
-const TunnelForm: React.FC<TunnelFormProps> = ({
+const ReusableForm: React.FC<ReusableFormProps> = ({
   title,
   fields,
   formData,
@@ -75,31 +75,9 @@ const TunnelForm: React.FC<TunnelFormProps> = ({
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {fields.map((field) => (
-              // <div key={field.name}>
-              //   <label>{field.name.replace(/([A-Z])/g, " $1")}</label>
-              //   {field.type === "select" ? (
-              //     <CustomSelect
-              //       options={field.options || []}
-              //       placeholder={`Select ${field.name}`}
-              //       onChange={(value) =>
-              //         setFormData({ ...formData, [field.name]: value })
-              //       }
-              //     />
-              //   ) : (
-              //     <Input
-              //       type={field.type}
-              //       placeholder={field.name.replace(/([A-Z])/g, " $1")}
-              //       value={formData[field.name]}
-              //       onChange={(e) =>
-              //         setFormData({ ...formData, [field.name]: e.target.value })
-              //       }
-              //     />
-              //   )}
-              // </div>
-
-              <div key={field.name}>
+              <div key={field.name} className="flex flex-col gap-1">
                 <label>{field.name.replace(/([A-Z])/g, " $1")}</label>
                 {field.type === "select" ? (
                   <CustomSelect
@@ -120,6 +98,7 @@ const TunnelForm: React.FC<TunnelFormProps> = ({
                 ) : field.type === "date" ? (
                   <DatePicker
                     onDateChange={(date) => {
+                      console.log("the date we are about to use is the ", date);
                       setFormData({ ...formData, [field.name]: date });
                     }}
                   />
@@ -148,4 +127,4 @@ const TunnelForm: React.FC<TunnelFormProps> = ({
   );
 };
 
-export default TunnelForm;
+export default ReusableForm;

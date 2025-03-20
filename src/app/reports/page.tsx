@@ -78,7 +78,7 @@ export default function ReportsPage() {
   ]);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 ">
       {/* Period Selector */}
       <div className="mb-6 flex justify-start">
         <Tabs

@@ -1,5 +1,4 @@
-"use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -13,25 +12,57 @@ interface CustomSelectProps {
   options: { value: string; label: string }[];
   placeholder?: string;
   onChange: (value: string) => void;
+  value?: string | null; // Accept selected value
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
   placeholder = "Select an option",
-  onChange
+  onChange,
+  value
 }) => {
+  // Local state to handle the auto-selection
+  const [selectedValue, setSelectedValue] = useState<string | null>(
+    value || null
+  );
+
+  useEffect(() => {
+         
+    if (options.length > 0 && !selectedValue) {
+      // Set the first option as selected if no value is set
+      setSelectedValue(options[0].value);
+       onChange(options[0].value);
+   
+  
+    }
+  }, [options, selectedValue, onChange]);
+
   return (
-    <Select onValueChange={onChange}>
+    <Select
+      onValueChange={(value) => {
+        onChange(value);
+        setSelectedValue(value); // Update local state when user selects an option
+      }}
+      value={selectedValue || ""} // Use local state as value
+      disabled={options.length === 0}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder={placeholder} />
+        <SelectValue
+          placeholder={options.length > 0 ? placeholder : "No data available"}
+        />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
+          {options.length >= 0 ? (
+            options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem disabled value="no-data">
+              No data available
             </SelectItem>
-          ))}
+          )}
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -39,34 +70,3 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 };
 
 export default CustomSelect;
-//  how to use it
-
-// const TunnelManagementSystem = () => {
-//   // State to store the selected option
-//   const [selectedMineSite, setSelectedMineSite] = useState<string | null>(null);
-
-//   // Options for the select dropdown
-//   const mineSiteOptions = [
-//     { value: "mine1", label: "Mine Site 1" },
-//     { value: "mine2", label: "Mine Site 2" },
-//     { value: "mine3", label: "Mine Site 3" }
-//   ];
-
-//   return (
-//     <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
-//       <h1 className="text-2xl font-bold">Tunnel Management System</h1>
-
-//       {/* CustomSelect for selecting a mine site */}
-//       <CustomSelect
-//         options={mineSiteOptions}
-//         placeholder="Select Mine Site"
-//         onChange={(value) => setSelectedMineSite(value)}
-//       />
-
-//       {/* Display the selected value */}
-//       <p className="mt-4">Selected Mine Site: {selectedMineSite || "None"}</p>
-//     </div>
-//   );
-// };
-
-// export default TunnelManagementSystem;

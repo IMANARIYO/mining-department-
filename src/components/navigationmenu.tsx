@@ -46,7 +46,7 @@ export function NavigationMenu() {
       collapsible="icon"
       className={` 
         ${isCollapsed === "expanded" ? "w-64" : "w-16"} 
-        transition-all duration-300 ease-in-out overflow-y-auto `}
+        transition-all duration-300 ease-in-out overflow-y-auto h-full `}
     >
       <SidebarContent className="w-full flex flex-col justify-between p-4">
         {/* Navigation Menu */}
@@ -102,8 +102,8 @@ export function NavigationMenu() {
                                 : "w-12 h-12 justify-center items-center"
                             }
                           `}
-                        >
-                          <TooltipTrigger>
+                       >
+                          <TooltipTrigger asChild>
                             <span className="text-lg">{item.icon}</span>
                           </TooltipTrigger>
                           {isCollapsed === "expanded" && (

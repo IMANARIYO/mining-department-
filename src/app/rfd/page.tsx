@@ -26,7 +26,7 @@ export default function RFDPage() {
   const [incidentType, setIncidentType] = useState<string>("");
 
   return (
-    <div className="flex flex-col p-6 gap-6 max-w-5xl mx-auto">
+    <div className="flex flex-col p-6 gap-6">
       {/* Production Targets Adjustments Section */}
       <Card className="p-6 bg-white rounded-lg shadow-sm">
         <h2 className="text-lg font-medium mb-4 text-[#5c4731]">

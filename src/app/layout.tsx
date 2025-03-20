@@ -31,16 +31,14 @@ export default function Layout({
   return (
     <html lang="en">
       <body
-        className={`  ${geistSans.variable} ${geistMono.variable} antialiased w-full h-screen`}
-      >
+        className={`  ${geistSans.variable} ${geistMono.variable} antialiased  h-full`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
-        >
+          disableTransitionOnChange>
           <SidebarProvider>
-            <div className="flex flex-row h-full w-full">
+            <div className="flex flex-row h-full w-[100vw]">
               <NavigationMenu />
               <div className="flex flex-col flex-1 ">
                 <Header />
