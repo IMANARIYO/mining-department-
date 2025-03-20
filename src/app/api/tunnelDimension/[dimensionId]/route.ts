@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 
-// ✅ PUT Tunnel Dimension (update the dimension by dimensionId)
-export async function PUT(
+// ✅ PATCH Tunnel Dimension (update the dimension by dimensionId)
+export async function PATCH(
   req: NextRequest,
   context: { params: { dimensionId: string } }
 ) {

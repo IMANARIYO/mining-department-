@@ -1,4 +1,5 @@
-// SiteFormSection.tsx
+"use client";
+
 import { useState } from "react";
 import { createSite } from "@/services/siteService";
 import ReusableForm from "@/components/ReusableForm";

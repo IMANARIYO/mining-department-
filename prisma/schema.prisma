@@ -118,42 +118,31 @@ model TunnelAdvancement {
   updatedAt       DateTime @default(now()) @updatedAt
 }
 // schema.prisma
-model BlastingPoposed {
-  id                String   @id @default(uuid()) @map("_id")
-  reportId          String
-  dateTime          DateTime @default(now())
-  blastLocation     String
-  blastId           String
-  rockType          String
-  groundStability   String
-  waterPresence     String
-  groundTemperature Float
-  numberOfHoles     Int
-  holeDepth         Float
-  holeDiameter      Float
-  holeCondition     String
-  ventilationPlan   Boolean
-  areaEvacuated     Boolean
-  personnelAccounted Boolean
-  equipmentRemoved  Boolean
-  teamLeadSignature String
-  teamMembers       String[]
-}
-
-
 model BlastLog {
-  id                String   @id @default(uuid()) @map("_id")
-  tunnelId          String
-  blastType         String
-  quantity          Int
-  failedBlastsQty   Int
-  delayPattern      String
-  blastPattern      String
-  misfiredBlastsQty Int
-  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now()) @updatedAt
+  id                  String   @id @default(uuid()) @map("_id")
+  tunnelId            String
+  tunnel              Tunnel   @relation(fields: [tunnelId], references: [id])
+  dateTime            DateTime @default(now())
+  blastLocation       String
+  blastId             String
+  rockType            String
+  groundStability     String
+  waterPresence       String
+  groundTemperature   Float
+  numberOfHoles       Int
+  holeDepth           Float
+  holeDiameter        Float
+  holeCondition       String
+  ventilationPlan     Boolean  @default(false)
+  areaEvacuated       Boolean  @default(false)
+  personnelAccounted  Boolean  @default(false)
+  equipmentRemoved    Boolean  @default(false)
+  teamLeadSignature   String?  // Optional
+  teamMembers         String[] @default([]) // Optional, defaults to empty array
 }
+
+
+
 
 model IncidentReport {
   id                String   @id @default(uuid()) @map("_id")

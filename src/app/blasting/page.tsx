@@ -1,12 +1,37 @@
-// src/components/BlastingForm.tsx
 "use client";
 
 import React, { useState } from "react";
-import axios from "axios";
-
-const BlastingForm: React.FC = () => {
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { createBlastLog } from "@/services/blastService";
+import { Toaster, toast } from "sonner";
+interface BlastingFormProps {
+  tunnelId: string;
+  onSubmitSuccess: () => void;
+}
+const BlastingForm: React.FC<BlastingFormProps> = ({
+  tunnelId,
+  onSubmitSuccess
+}) => {
   const [formData, setFormData] = useState({
-    reportId: "",
+    tunnelId: tunnelId,
+    // reportId: "",
     dateTime: new Date().toISOString(),
     blastLocation: "",
     blastId: "",
@@ -23,26 +48,82 @@ const BlastingForm: React.FC = () => {
     personnelAccounted: false,
     equipmentRemoved: false,
     teamLeadSignature: "",
-    teamMembers: ["", ""]
+    teamMembers: ["", ""] // Default 2 team members
   });
+  // Validation function
+  const validateForm = () => {
+    if (!formData.tunnelId) {
+      toast.error("Select tunnel, please.");
+      return false;
+    }
+    const requiredFields = [
+      // { name: "reportId", message: "Report ID is required" },
+      { name: "blastLocation", message: "Blast Location is required" },
+      { name: "rockType", message: "Rock Type is required" },
+      { name: "groundStability", message: "Ground Stability is required" },
+      { name: "waterPresence", message: "Water Presence is required" },
+      { name: "holeCondition", message: "Hole Condition is required" },
+      { name: "teamLeadSignature", message: "Team Lead Signature is required" }
+    ];
+
+    for (const field of requiredFields) {
+      if (formData[field.name as keyof typeof formData] === "" || formData[field.name as keyof typeof formData] == null) {
+        toast.error(field.message);
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type} = e.target;
-      const checked = (e.target as HTMLInputElement).checked;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setFormData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value
     }));
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: checked
+    }));
+  };
+
+  const handleAddMember = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      teamMembers: [...prevData.teamMembers, ""]
+    }));
+  };
+
+  const handleRemoveMember = (index: number) => {
+    const updatedMembers = formData.teamMembers.filter(
+      (_, idx) => idx !== index
+    );
+    setFormData((prevData) => ({
+      ...prevData,
+      teamMembers: updatedMembers
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("/api/blasting", formData);
+      await createBlastLog(formData);
       alert("Form submitted successfully!");
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -50,286 +131,329 @@ const BlastingForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 bg-white shadow-md rounded-lg space-y-6">
-      <h1 className="text-2xl font-bold mb-4">
-        Blasting Team Pre-Blast Report
-      </h1>
+    <form onSubmit={handleSubmit} className="space-y-6">
 
-      {/* Basic Information */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">Basic Information</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700">Report ID</label>
-            <input
-              type="text"
-              name="reportId"
-              value={formData.reportId}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Date & Time</label>
-            <input
-              type="datetime-local"
-              name="dateTime"
-              value={formData.dateTime}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <div>
-            <label className="block text-gray-700">Blast Location</label>
-            <input
-              type="text"
-              name="blastLocation"
-              value={formData.blastLocation}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Blast ID</label>
-            <input
-              type="text"
-              name="blastId"
-              value={formData.blastId}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-        </div>
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-semibold">Basic Information</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+                <div className="space-y-2">
+                  <Label htmlFor="dateTime">Date & Time</Label>
+                  <Input
+                    id="dateTime"
+                    name="dateTime"
+                    type="datetime-local"
+                    value={formData.dateTime}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="blastLocation">Blast Location</Label>
+                  <Input
+                    id="blastLocation"
+                    name="blastLocation"
+                    value={formData.blastLocation}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="blastId">Blast ID</Label>
+                  <Input
+                    id="blastId"
+                    name="blastId"
+                    value={formData.blastId}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Ground Conditions Assessment & Blast Hole Preparation */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">
-          Ground Conditions Assessment
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700">Rock Type</label>
-            <input
-              type="text"
-              name="rockType"
-              value={formData.rockType}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Ground Stability</label>
-            <input
-              type="text"
-              name="groundStability"
-              value={formData.groundStability}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <div>
-            <label className="block text-gray-700">Water Presence</label>
-            <input
-              type="text"
-              name="waterPresence"
-              value={formData.waterPresence}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Ground Temperature</label>
-            <input
-              type="number"
-              name="groundTemperature"
-              value={formData.groundTemperature}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
+          {/* Ground Conditions Assessment */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-semibold">
+                Ground Conditions Assessment
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="rockType">Rock Type</Label>
+                  <Input
+                    id="rockType"
+                    name="rockType"
+                    value={formData.rockType}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="groundStability">Ground Stability</Label>
+                  <Select
+                    value={formData.groundStability}
+                    onValueChange={(value) =>
+                      handleSelectChange("groundStability", value)
+                    }>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select stability" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Stable">Stable</SelectItem>
+                      <SelectItem value="Moderate">Moderate</SelectItem>
+                      <SelectItem value="Unstable">Unstable</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="waterPresence">Water Presence</Label>
+                  <Select
+                    value={formData.waterPresence}
+                    onValueChange={(value) =>
+                      handleSelectChange("waterPresence", value)
+                    }>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select water presence" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dry">Dry</SelectItem>
+                      <SelectItem value="Damp">Damp</SelectItem>
+                      <SelectItem value="Wet">Wet</SelectItem>
+                      <SelectItem value="Flowing">Flowing</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="groundTemperature">Ground Temperature</Label>
+                  <Input
+                    id="groundTemperature"
+                    name="groundTemperature"
+                    type="number"
+                    // value={formData.groundTemperature}
+                    // onChange={handleChange}
+                     onChange={(e) =>
+    setFormData((prevData) => ({
+      ...prevData,
+      groundTemperature: parseFloat(e.target.value) || 0
+    }))}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <h2 className="text-lg font-semibold mb-2 mt-4">
-          Blast Hole Preparation
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700">Number of Holes</label>
-            <input
-              type="number"
-              name="numberOfHoles"
-              value={formData.numberOfHoles}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Hole Diameter (mm)</label>
-            <input
-              type="number"
-              name="holeDiameter"
-              value={formData.holeDiameter}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
+        <div className="space-y-4">
+          {/* Blast Hole Preparation */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-semibold">Blast Hole Preparation</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="numberOfHoles">Number of Holes</Label>
+                  <Input
+                    id="numberOfHoles"
+                    name="numberOfHoles"
+                    type="number"
+                    value={formData.numberOfHoles}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="holeDiameter">Hole Diameter (mm)</Label>
+                  <Input
+                    id="holeDiameter"
+                    name="holeDiameter"
+                    type="number"
+                    value={formData.holeDiameter}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="holeDepth">Hole Depth (m)</Label>
+                  <Input
+                    id="holeDepth"
+                    name="holeDepth"
+                    type="number"
+                    value={formData.holeDepth}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Hole Condition</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="holeCondition-clean"
+                        checked={formData.holeCondition === "Clean"}
+                        onCheckedChange={() =>
+                          handleSelectChange("holeCondition", "Clean")
+                        }
+                      />
+                      <Label htmlFor="holeCondition-clean">Clean</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="holeCondition-blocked"
+                        checked={formData.holeCondition === "Blocked"}
+                        onCheckedChange={() =>
+                          handleSelectChange("holeCondition", "Blocked")
+                        }
+                      />
+                      <Label htmlFor="holeCondition-blocked">Blocked</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="holeCondition-partial"
+                        checked={formData.holeCondition === "Partially Blocked"}
+                        onCheckedChange={() =>
+                          handleSelectChange(
+                            "holeCondition",
+                            "Partially Blocked"
+                          )
+                        }
+                      />
+                      <Label htmlFor="holeCondition-partial">
+                        Partially Blocked
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Safety Checklist */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-semibold">Safety Checklist</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="ventilationPlan"
+                    checked={formData.ventilationPlan}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange(
+                        "ventilationPlan",
+                        checked as boolean
+                      )
+                    }
+                  />
+                  <Label htmlFor="ventilationPlan">
+                    Ventilation Plan Implemented
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="areaEvacuated"
+                    checked={formData.areaEvacuated}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange("areaEvacuated", checked as boolean)
+                    }
+                  />
+                  <Label htmlFor="areaEvacuated">
+                    Area Evacuated and Secured
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="personnelAccounted"
+                    checked={formData.personnelAccounted}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange(
+                        "personnelAccounted",
+                        checked as boolean
+                      )
+                    }
+                  />
+                  <Label htmlFor="personnelAccounted">
+                    Personnel Accounted For
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="equipmentRemoved"
+                    checked={formData.equipmentRemoved}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange(
+                        "equipmentRemoved",
+                        checked as boolean
+                      )
+                    }
+                  />
+                  <Label htmlFor="equipmentRemoved">
+                    Equipment Removed from Blast Area
+                  </Label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <div>
-            <label className="block text-gray-700">Hole Depth (m)</label>
-            <input
-              type="number"
-              name="holeDepth"
-              value={formData.holeDepth}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Hole Condition</label>
-            <div className="flex items-center space-x-2">
-              <label>
-                <input
-                  type="checkbox"
-                  name="holeCondition"
-                  value="Clean"
-                  checked={formData.holeCondition === "Clean"}
+
+        {/* Team Sign-off */}
+        <Card>
+          <CardHeader>
+            <h2 className="text-lg font-semibold">Team Sign-off</h2>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="teamLeadSignature">Team Lead Signature</Label>
+                <Input
+                  id="teamLeadSignature"
+                  name="teamLeadSignature"
+                  value={formData.teamLeadSignature}
                   onChange={handleChange}
-                  className="mr-2"
                 />
-                Clean
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="holeCondition"
-                  value="Blocked"
-                  checked={formData.holeCondition === "Blocked"}
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                Blocked
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="holeCondition"
-                  value="Partially Blocked"
-                  checked={formData.holeCondition === "Partially Blocked"}
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                Partially Blocked
-              </label>
+              </div>
+              <div className="space-y-2">
+                <Label>Team Members</Label>
+                {formData.teamMembers.map((member, index) => (
+                  <div key={index} className="flex items-center space-x-4">
+                    <Input
+                      value={member}
+                      onChange={(e) => {
+                        const newMembers = [...formData.teamMembers];
+                        newMembers[index] = e.target.value;
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          teamMembers: newMembers
+                        }));
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="text-red-500"
+                      onClick={() => handleRemoveMember(index)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  className="mt-4"
+                  onClick={handleAddMember}>
+                  Add Team Member
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Safety Checklist & Team Sign-off */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">Safety Checklist</h2>
-        <div className="space-y-2">
-          <div>
-            <label className="block text-gray-700">
-              <input
-                type="checkbox"
-                name="ventilationPlan"
-                checked={formData.ventilationPlan}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Ventilation Plan Implemented
-            </label>
-          </div>
-          <div>
-            <label className="block text-gray-700">
-              <input
-                type="checkbox"
-                name="areaEvacuated"
-                checked={formData.areaEvacuated}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Area Evacuated and Secured
-            </label>
-          </div>
-          <div>
-            <label className="block text-gray-700">
-              <input
-                type="checkbox"
-                name="personnelAccounted"
-                checked={formData.personnelAccounted}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Personnel Accounted For
-            </label>
-          </div>
-          <div>
-            <label className="block text-gray-700">
-              <input
-                type="checkbox"
-                name="equipmentRemoved"
-                checked={formData.equipmentRemoved}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Equipment Removed from Blast Area
-            </label>
-          </div>
-        </div>
-
-        <h2 className="text-lg font-semibold mb-2 mt-4">Team Sign-off</h2>
-        <div>
-          <label className="block text-gray-700">Team Lead Signature</label>
-          <input
-            type="text"
-            name="teamLeadSignature"
-            value={formData.teamLeadSignature}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          />
-        </div>
-        <div className="mt-2">
-          <label className="block text-gray-700">Team Members</label>
-          {formData.teamMembers.map((member, index) => (
-            <input
-              key={index}
-              type="text"
-              value={member}
-              onChange={(e) => {
-                const newMembers = [...formData.teamMembers];
-                newMembers[index] = e.target.value;
-                setFormData((prevData) => ({
-                  ...prevData,
-                  teamMembers: newMembers
-                }));
-              }}
-              className="w-full border rounded p-2 mb-2"
-            />
-          ))}
-        </div>
-
-        <div className="flex justify-end mt-4">
-          <button
-            type="button"
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded">
-            Submit Report
-          </button>
-        </div>
-      </div>
-    </div>
+      <CardFooter>
+        <Button type="submit">Submit</Button>
+      </CardFooter>
+    </form>
   );
 };
 

@@ -3,10 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
+
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,18 +23,19 @@ import {
 
 import { Textarea } from "@/components/ui/textarea";
 
-import CustomSelect from "@/components/CustomSelect";
 
-import { Label } from "@/components/ui/label";
 
-import TunnelDimensionForm from "./TunnelDimensionForm";
-import TunnelComponentForm from "./TunnelComponentForm";
-import TunnelAdvancementForm from "./TunnelAdvancementForm";
-import { getSites, getTunnelsBySiteId } from "@/services/siteService";
+
+
+
 import FilterBar from "./minesTunnelsFilterBar";
-import SiteForm from "./siteManagement/SiteForm";
+// import SiteForm from "./siteManagement/SiteForm";
 import IncidentReportForm from "./IncidentReportForm";
 import TunnelDimensionTabs from "./TunnelDimensionTabs";
+
+import BlastingForm from "../blasting/page";
+import SitesPage from "./sites/page";
+import {TunnelAdvancementPage} from "./tunnel-advancement/page";
 
 const TunnelManagementSystem = () => {
   const [filters, setFilters] = useState({
@@ -100,11 +98,9 @@ const TunnelManagementSystem = () => {
   const [selectedMineSite, setSelectedMineSite] = useState<string | null>(null);
   const [selectedTunnel, setSelectedTunnel] = useState<string | null>(null);
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
-  const [selectedSupport, setSelectedSupport] = useState("");
-  const [selectedCrossCut, setSelectedCrossCut] = useState("");
-  const [selectedProcessType, setSelectedProcessType] = useState("");
-  const [selectedBlastType, setSelectedBlastType] = useState("");
-  const [incidentType, setIncidentType] = useState("");
+
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   const [tunnelId, setTunnelId] = useState<string | undefined>(undefined);
    
   useEffect(() => {
@@ -120,30 +116,16 @@ const TunnelManagementSystem = () => {
     console.log("Tunnel dimension created successfully!");
   };
 
-  const [sosPeople, setSosPeople] = useState("");
-  const [peopleInvolved, setPeopleInvolved] = useState("");
-  const [rootCause, setRootCause] = useState("");
-  const [measuresTaken, setMeasuresTaken] = useState("");
+
   const [comments, setComments] = useState("");
 
-  const blastLogColumns: GridColDef[] = [
-    { field: "date", headerName: "Date", flex: 1 },
-    { field: "time", headerName: "Time", flex: 1 },
-    { field: "tunnel", headerName: "Tunnel", flex: 1 },
-    { field: "location", headerName: "Location (m)", flex: 1 },
-    { field: "pattern", headerName: "Pattern", flex: 1 },
-    { field: "explosive", headerName: "Explosive", flex: 1 },
-    { field: "result", headerName: "Result", flex: 1 }
-  ];
+
 
   const shifts = [
     { value: "day", label: "Day Shift" },
     { value: "night", label: "Night Shift" }
   ];
-  const incidents = [
-    { value: "fall", label: "Rock Fall" },
-    { value: "fire", label: "Fire" }
-  ];
+
    
   const togglePresence = (id: string, type: "manpower" | "equipment") => {
     if (type === "manpower") {
@@ -160,38 +142,7 @@ const TunnelManagementSystem = () => {
       );
     }
   };
-  const blastLogRows = [
-    {
-      id: 1,
-      date: "2025-03-08",
-      time: "14:30",
-      tunnel: "Tunnel #1",
-      location: 156.5,
-      pattern: "Burn Cut",
-      explosive: "45.2 kg ANFO",
-      result: "Good"
-    },
-    {
-      id: 2,
-      date: "2025-03-07",
-      time: "15:15",
-      tunnel: "Tunnel #1",
-      location: 152.0,
-      pattern: "Burn Cut",
-      explosive: "43.8 kg ANFO",
-      result: "Excellent"
-    },
-    {
-      id: 3,
-      date: "2025-03-06",
-      time: "14:45",
-      tunnel: "Tunnel #1",
-      location: 146.8,
-      pattern: "Wedge Cut",
-      explosive: "40.5 kg ANFO",
-      result: "Satisfactory"
-    }
-  ];
+
 
   const manpowerColumns: GridColDef[] = [
     { field: "id", headerName: "ID", hideable: false, width: 20 },
@@ -261,15 +212,7 @@ const TunnelManagementSystem = () => {
       )
     }
   ];
-   
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      e.target.value = value;  
-    } else {
-      e.target.value = value.replace(/\D/g, "");  
-    }
-  };
+
   const DataTable = ({
     columns,
     rows,
@@ -280,7 +223,7 @@ const TunnelManagementSystem = () => {
     title: string;
   }) => {
     return (
-      <Card className=" max-w-full">
+      <Card className="w-full">
         <CardHeader className="flex flex-row justify-between items-center">
           <CardTitle>{title}</CardTitle>
           <Button variant="outline" size="icon">
@@ -311,7 +254,8 @@ const TunnelManagementSystem = () => {
     { value: "report", label: "incident reporting" },
     { value: "tunnel-advancements", label: "Tunnel Advancementss" },
     { value: "blast-log", label: "Blast Log Detaill" },
-    { value: "production", label: "production reporting" }
+    { value: "production", label: "production reporting" },
+    {value: "manpower-Equipmant", label: "equipmentsand man power" }
   ];
    const tunnelDimensionTabs = [
      { value: "tunnel-dimensions", label: "Tunnel Dimensions" },
@@ -339,26 +283,6 @@ const TunnelManagementSystem = () => {
         </div>
       </div>
       <FilterBar onFilterChange={setFilters} />
-      {/* <div>
-        <h2>Selected Filters:</h2>
-        <p>
-          Mine Site:{" "}
-          {filters.selectedMineSite
-            ? `${filters.selectedMineSite.name} (ID: ${filters.selectedMineSite.id})`
-            : "None"}
-        </p>
-        <p>
-          Tunnel:{" "}
-          {filters.selectedTunnel
-            ? `${filters.selectedTunnel.name} (ID: ${filters.selectedTunnel.id})`
-            : "None"}
-        </p>
-        <p>Shift: {filters.selectedShift || "None"}</p>
-        <p>
-          Date:{" "}
-          {filters.selectedDate ? filters.selectedDate.toDateString() : "None"}
-        </p>
-      </div> */}
       <Tabs defaultValue="site-info" className="w-full">
         <TabsList className="grid w-full grid-cols-1  sm:grid-cols-4 md:grid-cols-6 h-full gap-2">
           {tabs.map((tab) => (
@@ -377,33 +301,15 @@ const TunnelManagementSystem = () => {
           ))}
         </TabsList>
         <TabsContent value="site-info">
-          <SiteForm />
-          {/* <Card>
+          <SitesPage />
+        </TabsContent>
+        <TabsContent value="manpower-Equipmant">
+          {" "}
+          <Card>
             <CardHeader>
               <CardTitle>Site Inspection</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 max-w-[100%] h-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <CustomSelect
-                  options={mineSites}
-                  placeholder="Select Mine Site"
-                  onChange={(value) => setSelectedMineSite(value)}
-                />
-                <CustomSelect
-                  options={tunnels}
-                  placeholder="Select Tunnel ID"
-                  onChange={(value) => setSelectedTunnel(value)}
-                />
-                <CustomSelect
-                  options={shifts}
-                  placeholder="Select Shift"
-                  onChange={(value) => setSelectedShift(value)}
-                />
-                <div className="relative">
-                  <DatePicker onDateChange={(date) => setSelectedDate(date)} />
-                </div>
-              </div>
-
               <DataTable
                 title="Roll Call Manpower on Site"
                 columns={manpowerColumns}
@@ -415,22 +321,13 @@ const TunnelManagementSystem = () => {
                 rows={equipmentData}
               />
             </CardContent>
-          </Card> */}
+          </Card>
         </TabsContent>
         <TabsContent value="tunnel-dimensions">
           <TunnelDimensionTabs
             tunnelId={tunnelId || ""}
             handleFormSubmitSuccess={handleFormSubmitSuccess}
           />
-
-          {/* <TunnelDimensionForm
-            tunnelId={tunnelId || ""}
-            onSubmitSuccess={handleFormSubmitSuccess}
-          />
-          <TunnelComponentForm
-            tunnelId={tunnelId || ""}
-            onSubmitSuccess={handleFormSubmitSuccess}
-          /> */}
         </TabsContent>
         <TabsContent value="production">
           <Card>
@@ -459,52 +356,12 @@ const TunnelManagementSystem = () => {
               <CardTitle>Tunnel Advancements</CardTitle>
             </CardHeader>
             <CardContent>
-              <TunnelAdvancementForm
-                tunnelId={tunnelId || ""}
-                onSubmitSuccess={handleFormSubmitSuccess}
-              />
-
-              <div className="mt-8">
-                <h3 className="text-lg font-medium mb-4 w-y">
-                  Recent Advancements
-                </h3>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Tunnel</TableHead>
-                        <TableHead>Distance (m)</TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead>Cumulative (m)</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>2025-03-08</TableCell>
-                        <TableCell>Tunnel #1</TableCell>
-                        <TableCell>4.5</TableCell>
-                        <TableCell>Drill and Blast</TableCell>
-                        <TableCell>156.5</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>2025-03-07</TableCell>
-                        <TableCell>Tunnel #1</TableCell>
-                        <TableCell>5.2</TableCell>
-                        <TableCell>Drill and Blast</TableCell>
-                        <TableCell>152.0</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>2025-03-07</TableCell>
-                        <TableCell>Tunnel #2</TableCell>
-                        <TableCell>8.7</TableCell>
-                        <TableCell>TBM</TableCell>
-                        <TableCell>203.4</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+           
+           
+    <TunnelAdvancementPage
+      tunnelId={tunnelId || ""}
+    />
+           
             </CardContent>
           </Card>
         </TabsContent>
@@ -515,135 +372,10 @@ const TunnelManagementSystem = () => {
               <CardTitle>Blast Log Detail</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-6">
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="blast-date">Blast Date</Label>
-                      <Input id="blast-date" type="date" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="blast-time">Blast Time</Label>
-                      <Input id="blast-time" type="time" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="blast-tunnel">Tunnel</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select tunnel" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tunnel-1">Tunnel #1</SelectItem>
-                          <SelectItem value="tunnel-2">Tunnel #2</SelectItem>
-                          <SelectItem value="tunnel-3">Tunnel #3</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="blast-location">Chainage (m)</Label>
-                      <Input
-                        id="blast-location"
-                        type="number"
-                        step="0.1"
-                        placeholder="Enter chainage"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="blast-pattern">Blast Pattern</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select pattern" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="wedge-cut">Wedge Cut</SelectItem>
-                          <SelectItem value="burn-cut">Burn Cut</SelectItem>
-                          <SelectItem value="v-cut">V-Cut</SelectItem>
-                          <SelectItem value="fan-cut">Fan Cut</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="hole-count">Number of Holes</Label>
-                      <Input
-                        id="hole-count"
-                        type="number"
-                        placeholder="Enter hole count"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="explosive-type">Explosive Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select explosive type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="anfo">ANFO</SelectItem>
-                          <SelectItem value="emulsion">Emulsion</SelectItem>
-                          <SelectItem value="dynamite">Dynamite</SelectItem>
-                          <SelectItem value="slurry">Slurry</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="explosive-quantity">
-                        Explosive Quantity (kg)
-                      </Label>
-                      <Input
-                        id="explosive-quantity"
-                        type="number"
-                        step="0.1"
-                        placeholder="Enter quantity"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="blast-result">Blast Result</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select result" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="excellent">Excellent</SelectItem>
-                        <SelectItem value="good">Good</SelectItem>
-                        <SelectItem value="satisfactory">
-                          Satisfactory
-                        </SelectItem>
-                        <SelectItem value="poor">Poor</SelectItem>
-                        <SelectItem value="failed">Failed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="blast-notes">Notes</Label>
-                    <Textarea
-                      id="blast-notes"
-                      placeholder="Enter notes"
-                      rows={4}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="bg-amber-800 hover:bg-amber-900">
-                  Record Blast
-                </Button>
-              </form>
+              <BlastingForm
+                tunnelId={tunnelId || ""}
+                onSubmitSuccess={handleFormSubmitSuccess}
+              />
 
               <div className="mt-8">
                 <h3 className="text-lg font-medium mb-4">

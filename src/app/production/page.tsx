@@ -6,7 +6,7 @@ import { IncidenceReport } from "@/components/mining/incidence";
 import { ProductionReport } from "@/components/mining/production";
 export default function ProductionPage() {
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 ">
       {/* Tab Navigation */}
       <Tabs defaultValue="production" className="w-full">
         <TabsList className="mb-8 bg-transparent">
