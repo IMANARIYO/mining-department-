@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import Response from "@/lib/Response";
 async function resolveContextParams(context: any) {
   const resolvedParams = await Promise.resolve(context.params);
@@ -11,7 +11,7 @@ export async function GET(
   try {
     const { siteId } = await resolveContextParams(context);
     const site = await prisma.site.findUnique({
-      where: { id: siteId }
+      where: { id: siteId },
     });
 
     if (!site) {
@@ -41,7 +41,7 @@ export async function PATCH(
 
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
-      data: { ...data }
+      data: { ...data },
     });
 
     return Response.success(200, updatedSite, "Site updated successfully");
@@ -62,7 +62,7 @@ export async function DELETE(
     const { siteId } = await resolveContextParams(context);
 
     await prisma.site.delete({
-      where: { id: siteId }
+      where: { id: siteId },
     });
 
     return Response.success(200, null, "Site deleted successfully");

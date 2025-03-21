@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import Response from "@/lib/Response";
 
 export async function GET(
@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { blastId } = await Promise.resolve(context.params);
     const blastLog = await prisma.blastLog.findUnique({
-      where: { id: blastId }
+      where: { id: blastId },
     });
 
     if (!blastLog) {
@@ -36,7 +36,7 @@ export async function PATCH(
 
     const updatedBlastLog = await prisma.blastLog.update({
       where: { id: blastId },
-      data: body
+      data: body,
     });
 
     return Response.success(
@@ -61,7 +61,7 @@ export async function DELETE(
     const { blastId } = await Promise.resolve(context.params);
 
     await prisma.blastLog.delete({
-      where: { id: blastId }
+      where: { id: blastId },
     });
 
     return Response.success(200, null, "Blast log deleted successfully");

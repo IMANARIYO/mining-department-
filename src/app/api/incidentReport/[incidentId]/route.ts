@@ -1,7 +1,7 @@
 // /app/api/incidentReports/[incidentId]/route.ts
 
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
+import {prisma} from "@/lib/prisma";
 import Response from "@/lib/Response";
 
 // Helper function to resolve `incidentId`
@@ -20,9 +20,7 @@ export async function GET(
 
     const incidentReport = await prisma.incidentReport.findUnique({
       where: { id: incidentId },
-      include: {
-        comments: true // Optionally include related comments
-      }
+   
     });
 
     return Response.success(

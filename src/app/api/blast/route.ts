@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "@/lib/prisma"; // Ensure you have Prisma set up
+import { prisma } from "@/lib/prisma"; // Ensure you have Prisma set up
 import Response from "@/lib/Response";
 
 export async function GET() {
@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newBlastLog = await prisma.blastLog.create({
-      data: body
+      data: body,
     });
     return Response.success(201, newBlastLog, "Blast log created successfully");
   } catch (error) {
-    console.log("erro creating the blast  ", error)
+    console.log("erro creating the blast  ", error);
     return Response.error(
       500,
       (error as Error).message,

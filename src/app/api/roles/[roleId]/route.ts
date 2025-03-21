@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ GET Role by ID
 export async function GET(
@@ -14,7 +14,7 @@ export async function GET(
 
   try {
     const role = await prisma.role.findUnique({
-      where: { id: roleId }
+      where: { id: roleId },
     });
 
     if (!role) {
@@ -52,7 +52,7 @@ export async function PATCH(
 
   try {
     const roleExists = await prisma.role.findUnique({
-      where: { id: roleId }
+      where: { id: roleId },
     });
 
     if (!roleExists) {
@@ -61,7 +61,7 @@ export async function PATCH(
 
     const updatedRole = await prisma.role.update({
       where: { id: roleId },
-      data: { name }
+      data: { name },
     });
 
     return NextResponse.json(
@@ -90,7 +90,7 @@ export async function DELETE(
 
   try {
     const roleExists = await prisma.role.findUnique({
-      where: { id: roleId }
+      where: { id: roleId },
     });
 
     if (!roleExists) {
@@ -98,7 +98,7 @@ export async function DELETE(
     }
 
     const usersWithRole = await prisma.userRole.count({
-      where: { roleId }
+      where: { roleId },
     });
 
     if (usersWithRole > 0) {
@@ -109,7 +109,7 @@ export async function DELETE(
     }
 
     await prisma.role.delete({
-      where: { id: roleId }
+      where: { id: roleId },
     });
 
     return NextResponse.json(
