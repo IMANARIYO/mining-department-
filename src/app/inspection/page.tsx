@@ -1,35 +1,25 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-
-} from "@/components/ui/select";
-
+import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle, CheckCircle } from "lucide-react";
-
-
 import FilterBar from "./minesTunnelsFilterBar";
-
-
 import TunnelDimensionTabs from "./TunnelDimensionTabs";
 
-import BlastingForm from "../blasting/BlastingForm";
 import SitesPage from "./sites/page";
-import {TunnelAdvancementPage} from "./tunnel-advancement/page";
+import { TunnelAdvancementPage } from "./tunnel-advancement/page";
 import { useSiteStore } from "@/siteStore";
 import { IncidentReportPage } from "./incident-report/page";
 import BlastLogPage from "../blasting/page";
 import { ProductionReportPage } from "./productionReport/page";
 
 const TunnelManagementSystem = () => {
-  const { mineSites, fetchSitesData, loading } = useSiteStore();
+  const { fetchSitesData, loading } = useSiteStore();
 
   useEffect(() => {
     fetchSitesData();
@@ -69,7 +59,6 @@ const TunnelManagementSystem = () => {
     }
   ]);
 
-
   const [equipmentData, setEquipmentData] = useState([
     {
       id: "1",
@@ -89,26 +78,19 @@ const TunnelManagementSystem = () => {
     }
   ]);
 
-  const [selectedShift, setSelectedShift] = useState<string | null>(null);
-
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
   const [tunnelId, setTunnelId] = useState<string | undefined>(undefined);
-   
+
   useEffect(() => {
-     
     if (filters.selectedTunnel) {
       setTunnelId(filters.selectedTunnel.id);
     } else {
-      setTunnelId(undefined);  
+      setTunnelId(undefined);
     }
-  }, [ filters.selectedTunnel]);
-
+  }, [filters.selectedTunnel]);
 
   const handleFormSubmitSuccess = () => {
     console.log("Tunnel dimension created successfully!");
   };
-
 
   const togglePresence = (id: string, type: "manpower" | "equipment") => {
     if (type === "manpower") {
@@ -125,7 +107,6 @@ const TunnelManagementSystem = () => {
       );
     }
   };
-
 
   const manpowerColumns: GridColDef[] = [
     { field: "id", headerName: "ID", hideable: false, width: 20 },
@@ -238,12 +219,12 @@ const TunnelManagementSystem = () => {
     { value: "tunnel-advancements", label: "Tunnel Advancementss" },
     { value: "blast-log", label: "Blast Log Detaill" },
     { value: "production", label: "production reporting" },
-    {value: "manpower-Equipmant", label: "equipmentsand man power" }
+    { value: "manpower-Equipmant", label: "equipmentsand man power" }
   ];
-   const tunnelDimensionTabs = [
-     { value: "tunnel-dimensions", label: "Tunnel Dimensions" },
-     { value: "tunnel-components", label: "Tunnel Components" }
-   ];
+  const tunnelDimensionTabs = [
+    { value: "tunnel-dimensions", label: "Tunnel Dimensions" },
+    { value: "tunnel-components", label: "Tunnel Components" }
+  ];
 
   interface Tab {
     value: string;
@@ -314,24 +295,6 @@ const TunnelManagementSystem = () => {
           />
         </TabsContent>
         <TabsContent value="production">
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Production Report</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <Input placeholder="Daily Production Plan" />
-                <Input placeholder="Booked Meter" />
-                <Input placeholder="Actual Meter" />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <Input placeholder="Variance" />
-                <Input placeholder="Material excavated (Wagon)" />
-                <Input placeholder="Waste excavated (Wagon)" />
-              </div>
-              <Button className="w-full">GENERATE TAG</Button>
-            </CardContent>
-          </Card> */}
           <ProductionReportPage tunnelId={tunnelId || ""} />
         </TabsContent>
         {/* Tunnel Advancements Tab Content */}
@@ -352,61 +315,7 @@ const TunnelManagementSystem = () => {
               <CardTitle>Blast Log Detail</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* <BlastingForm
-                tunnelId={tunnelId || ""}
-                onSubmitSuccess={handleFormSubmitSuccess}
-              /> */}
               <BlastLogPage tunnelId={tunnelId || ""} />
-
-              {/* <div className="mt-8">
-                <h3 className="text-lg font-medium mb-4">
-                  Recent Blast Records
-                </h3>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Tunnel</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Pattern</TableHead>
-                        <TableHead>Explosive</TableHead>
-                        <TableHead>Result</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>2025-03-08</TableCell>
-                        <TableCell>14:30</TableCell>
-                        <TableCell>Tunnel #1</TableCell>
-                        <TableCell>156.5</TableCell>
-                        <TableCell>Burn Cut</TableCell>
-                        <TableCell>45.2 kg ANFO</TableCell>
-                        <TableCell>Good</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>2025-03-07</TableCell>
-                        <TableCell>15:15</TableCell>
-                        <TableCell>Tunnel #1</TableCell>
-                        <TableCell>152.0</TableCell>
-                        <TableCell>Burn Cut</TableCell>
-                        <TableCell>43.8 kg ANFO</TableCell>
-                        <TableCell>Excellent</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>2025-03-06</TableCell>
-                        <TableCell>14:45</TableCell>
-                        <TableCell>Tunnel #1</TableCell>
-                        <TableCell>146.8</TableCell>
-                        <TableCell>Wedge Cut</TableCell>
-                        <TableCell>40.5 kg ANFO</TableCell>
-                        <TableCell>Satisfactory</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </div> */}
             </CardContent>
           </Card>
         </TabsContent>
