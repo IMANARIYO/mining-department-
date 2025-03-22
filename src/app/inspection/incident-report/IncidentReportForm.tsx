@@ -2,17 +2,19 @@
 
 import React, { useState } from "react";
 import { createIncidentReport } from "@/services/incidentReportService"; // Import the service for Incident Report
-
 import { Toaster, toast } from "sonner"; // Using toasts for error/success feedback
 import ReusableForm from "@/components/ReusableForm";
+import { Button } from "@/components/ui/button"; // Import button
 
 interface IncidentReportFormProps {
-  tunnelId: string; // Assuming tunnelId is passed in as a prop
+  tunnelId: string;
+  userId: string; // Needed for comment submission
   onSubmitSuccess: () => void;
 }
 
 const IncidentReportForm: React.FC<IncidentReportFormProps> = ({
   tunnelId,
+  userId,
   onSubmitSuccess
 }) => {
   const [formData, setFormData] = useState<
@@ -22,10 +24,10 @@ const IncidentReportForm: React.FC<IncidentReportFormProps> = ({
     incidentType: "",
     peopleInvolved: "",
     rootCauseAnalysis: "",
-    measuresTaken: "",
-    notes: ""
+    measuresTaken: ""
   });
 
+  const [showCommentField, setShowCommentField] = useState(false); // State to toggle comment field
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form validation
@@ -48,10 +50,10 @@ const IncidentReportForm: React.FC<IncidentReportFormProps> = ({
   };
 
   // Handle form submission
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async () => {
     if (!validateForm()) return { status: "error" };
 
-    const finalData = {
+    const finalData: any = {
       tunnelId: formData.tunnelId as string,
       incidentType: formData.incidentType as string,
       peopleInvolved: formData.peopleInvolved as string,
@@ -59,9 +61,19 @@ const IncidentReportForm: React.FC<IncidentReportFormProps> = ({
       measuresTaken: formData.measuresTaken as string
     };
 
+    // Include comment if it was added
+    if (
+      showCommentField &&
+      formData.comment &&
+      typeof formData.comment === "string" && formData.comment.trim() !== ""
+    ) {
+      finalData.comment = formData.comment;
+      finalData.userId = userId;
+    }
+
     try {
       setIsSubmitting(true);
-      await createIncidentReport(finalData); // Call the service to create the incident report
+      await createIncidentReport(finalData);
       toast.success("Incident Report recorded successfully");
       onSubmitSuccess();
       return { status: "success" };
@@ -74,29 +86,41 @@ const IncidentReportForm: React.FC<IncidentReportFormProps> = ({
     }
   };
 
-  const incidentReportFields: {
-    name: string;
-    type: "number" | "text" | "select" | "textarea" | "date";
-    options?: { value: string; label: string }[];
-  }[] = [
-    { name: "incidentType", type: "text" },
-    { name: "peopleInvolved", type: "text" },
-    { name: "rootCauseAnalysis", type: "textarea" },
-    { name: "measuresTaken", type: "textarea" }
+  const incidentReportFields = [
+    { name: "incidentType", type: "text" as "text" },
+    { name: "peopleInvolved", type: "text" as "text" },
+    { name: "rootCauseAnalysis", type: "textarea" as "textarea" },
+    { name: "measuresTaken", type: "textarea" as "textarea" }
   ];
 
+  // Conditionally add the comment field if the button is clicked
+  if (showCommentField) {
+    incidentReportFields.push({ name: " additional comment", type: "textarea" });
+  }
+
   return (
-    <ReusableForm
-      title="Incident Report"
-      fields={incidentReportFields}
-      formData={formData}
-      setFormData={setFormData}
-      submitFunction={handleSubmit}
-      onSubmitSuccess={onSubmitSuccess}
-      isSubmitting={isSubmitting}
-      setIsSubmitting={setIsSubmitting}
-      validateForm={validateForm}
-    />
+    <div>
+      <ReusableForm
+        title="Incident Report"
+        fields={incidentReportFields}
+        formData={formData}
+        setFormData={setFormData}
+        submitFunction={handleSubmit}
+        onSubmitSuccess={onSubmitSuccess}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        validateForm={validateForm}
+      />
+
+      {/* Button to toggle the comment field */}
+      {!showCommentField && (
+        <Button
+          onClick={() => setShowCommentField(true)}
+          className="mt-4 w-full">
+          Add Comment
+        </Button>
+      )}
+    </div>
   );
 };
 

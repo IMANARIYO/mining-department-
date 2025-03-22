@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Response from "@/lib/Response";
+import { NextRequest} from "next/server";
 
 // ✅ CHECK IF USER HAS A SPECIFIC ROLE BY ROLE ID
 export async function GET(
@@ -16,23 +17,23 @@ export async function GET(
     });
 
     if (usersWithRole.length === 0) {
-      return NextResponse.json(
-        { error: "No users have this role" },
-        { status: 404 }
+      return Response.error(
+        404,
+        "No users have this role",
+        "No users found with the given role ID"
       );
     }
 
-    return NextResponse.json(
-      { users: usersWithRole.map((userRole) => userRole.user) },
-      { status: 200 }
+    return Response.success(
+      200,
+      usersWithRole.map((userRole) => userRole.user),
+      "Users with the specified role fetched successfully"
     );
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: "Failed to check role for users",
-        message: (error as Error).message,
-      },
-      { status: 500 }
+    return Response.error(
+      500,
+      "Failed to check role for users",
+      (error as Error).message
     );
   }
 }

@@ -1,7 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TunnelDimensionForm from "./tunnelDimmesions/TunnelDimensionForm";
-import TunnelComponentForm from "./TunnelComponentForm";
+import TunnelComponentForm from "./tunnelComponents/TunnelComponentForm";
 import TunnelDimensionsPage from "./tunnelDimmesions/tunnel-dimensions-page";
+import TunnelComponentsPage from "./tunnelComponents/tunnel-components-page";
 
 interface TunnelDimensionTabsProps {
   tunnelId: string;
@@ -46,10 +47,15 @@ export default function TunnelDimensionTabs({
       </TabsContent>
 
       <TabsContent value="tunnel-components">
-        <TunnelComponentForm
+        {/* <TunnelComponentForm
           tunnelId={tunnelId}
           onSubmitSuccess={handleFormSubmitSuccess}
-        />
+        /> */}
+        <TunnelComponentsPage
+        tunnelId={tunnelId}
+          // onSubmitSuccess={handleFormSubmitSuccess}
+          />
+        
       </TabsContent>
     </Tabs>
   );

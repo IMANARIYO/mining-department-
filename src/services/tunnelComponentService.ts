@@ -52,7 +52,7 @@ export const updateTunnelComponent = async (
   tunnelComponentData: Record<string, any>
 ) => {
   try {
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.patch(
       `${TUNNEL_COMPONENT_API_URL}/${tunnelComponentId}`,
       tunnelComponentData
     );

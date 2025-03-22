@@ -34,7 +34,6 @@ model UserRole {
   roleId String
   user   User   @relation(fields: [userId], references: [id])
   role   Role   @relation(fields: [roleId], references: [id])
-
   @@unique([userId, roleId])
 }
 
@@ -67,7 +66,6 @@ model Tunnel {
   inspections       SiteInspection[]
   productionReports ProductionReport[]
   site              Site                @relation(fields: [siteId], references: [id], onDelete: Cascade)
- 
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @default(now()) @updatedAt
 }
@@ -90,7 +88,7 @@ model TunnelComponent {
   id                String   @id @default(uuid()) @map("_id")
   tunnelId          String
   componentType     String
-  distanceFromEntry String
+  distanceFromEntry  Int
   length            String
   deviationAngle    String
   widthDimensions   String
@@ -136,11 +134,23 @@ model BlastLog {
   areaEvacuated       Boolean  @default(false)
   personnelAccounted  Boolean  @default(false)
   equipmentRemoved    Boolean  @default(false)
-  teamLeadSignature   String?  // Optional
-  teamMembers         String[] @default([]) // Optional, defaults to empty array
+  teamLeadSignature   String? 
+  teamMembers         String[] @default([]) 
 }
 
-
+model ProductionReport {
+  id                String   @id @default(uuid()) @map("_id")
+  tunnelId          String
+  dailyPlan         Float
+  bookedMeter       Float
+  actualMeter       Float
+  variance          Float
+  materialExcavated Int
+  wasteExcavated    Int
+  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
 
 
 model IncidentReport {
@@ -155,14 +165,13 @@ model IncidentReport {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
 }
-
 model Comment {
   id        String   @id @default(uuid()) @map("_id")
 content   String
 userId    String
  incidentReportId  String 
   user      User     @relation(fields: [userId], references: [id])
-  incidentReport    IncidentReport @relation(fields: [incidentReportId], references: [id])
+  incidentReport    IncidentReport @relation(fields: [incidentReportId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
@@ -183,19 +192,6 @@ model SiteInspection {
   updatedAt      DateTime    @default(now()) @updatedAt
 }
 
-model ProductionReport {
-  id                String   @id @default(uuid()) @map("_id")
-  tunnelId          String
-  dailyPlan         Float
-  bookedMeter       Float
-  actualMeter       Float
-  variance          Float
-  materialExcavated Int
-  wasteExcavated    Int
-  tunnel            Tunnel   @relation(fields: [tunnelId], references: [id])
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now()) @updatedAt
-}
 
 // Add this to your schema.prisma file
 model Attendance {

@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Response from "@/lib/Response"; // Import custom Response class
+import { NextRequest } from "next/server";
 
-// CREATE Role (POST)
+// ✅ CREATE Role (POST)
 export async function POST(req: NextRequest) {
   const { name } = await req.json();
 
-  // Ensure role name is provided
   if (!name) {
-    return NextResponse.json(
-      { error: "Role name is required" },
-      { status: 400 }
+    return Response.error(
+      400,
+      "Role name is required",
+      "Please provide a role name"
     );
   }
 
@@ -20,9 +21,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingRole) {
-      return NextResponse.json(
-        { error: "Role with this name already exists" },
-        { status: 400 }
+      return Response.error(
+        400,
+        "Role with this name already exists",
+        "Choose a different name"
       );
     }
 
@@ -31,20 +33,18 @@ export async function POST(req: NextRequest) {
       data: { name },
     });
 
-    return NextResponse.json(
-      { message: "Role created successfully", role: newRole },
-      { status: 201 }
-    );
+    return Response.success(201, newRole, "Role created successfully");
   } catch (error) {
     console.error("Error creating role:", error);
-    return NextResponse.json(
-      { error: "Failed to create role", message: (error as Error).message },
-      { status: 500 }
+    return Response.error(
+      500,
+      "Failed to create role",
+      (error as Error).message
     );
   }
 }
 
-// GET ALL Roles (GET)
+// ✅ GET ALL Roles (GET)
 export async function GET(req: NextRequest) {
   try {
     // Fetch all roles along with associated users
@@ -56,19 +56,24 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Map roles to include only relevant user details
+    // Format roles to include only relevant user details
     const formattedRoles = roles.map((role) => ({
       id: role.id,
       name: role.name,
       users: role.users.map((userRole) => userRole.user), // Extract users for each role
     }));
 
-    return NextResponse.json({ roles: formattedRoles }, { status: 200 });
+    return Response.success(
+      200,
+      formattedRoles,
+      "Roles retrieved successfully"
+    );
   } catch (error) {
     console.error("Error fetching roles:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch roles", message: (error as Error).message },
-      { status: 500 }
+    return Response.error(
+      500,
+      "Failed to fetch roles",
+      (error as Error).message
     );
   }
 }

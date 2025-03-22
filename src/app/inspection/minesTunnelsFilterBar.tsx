@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CustomSelect from "@/components/CustomSelect";
 import { DatePicker } from "@/components/DatePicker";
 import { getSites, getTunnelsBySiteId } from "@/services/siteService";
+import { useSiteStore } from "@/siteStore";
 
 // Define type for site and tunnel
 interface Site {
@@ -24,32 +25,23 @@ interface FilterBarProps {
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
-  const [mineSites, setMineSites] = useState<Site[]>([]);
+  // const [mineSites, setMineSites] = useState<Site[]>([]);
   const [tunnels, setTunnels] = useState<Tunnel[]>([]);
 
   const shifts = [
     { value: "day", label: "Day Shift" },
     { value: "night", label: "Night Shift" }
   ];
-
+const { mineSites, fetchSitesData } = useSiteStore();
   const [selectedMineSite, setSelectedMineSite] = useState<Site | null>(null);
   const [selectedTunnel, setSelectedTunnel] = useState<Tunnel | null>(null);
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   // Fetch mine sites
-  useEffect(() => {
-    const fetchSites = async () => {
-      try {
-        const response = await getSites();
-        setMineSites(response.data);
-      } catch (error) {
-        console.error("Failed to fetch sites:", error);
-      }
-    };
-    fetchSites();
-  }, []);
-
+// useEffect(() => {
+//   fetchSitesData();
+// }, []);
   // Fetch tunnels when a mine site is selected
   useEffect(() => {
     if (!selectedMineSite) return;
