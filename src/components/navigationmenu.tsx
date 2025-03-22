@@ -20,7 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChevronLeft, Moon, Sun } from "lucide-react";
+import { ChevronLeft, Moon, Sun, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
@@ -28,6 +28,7 @@ import { useTheme } from "next-themes";
 const menuItems = [
   { title: "Performance", url: "/", icon: "⭕" },
   { title: "Production", url: "/production", icon: "🔺" },
+  { title: "users", url: "/user", icon: <User/> },
   { title: "Inspection", url: "/inspection", icon: "▣" },
   { title: "RFD", url: "/rfd", icon: "☑" },
   { title: "Reports", url: "reports", icon: "↻" },
