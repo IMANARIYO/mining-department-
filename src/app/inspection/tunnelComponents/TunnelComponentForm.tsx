@@ -66,7 +66,7 @@ const TunnelComponentForm: React.FC<TunnelComponentFormProps> = ({
           : formData.supported === "false"
           ? false
           : undefined,
-      distanceFromEntry: formData.distanceFromEntry,
+      distanceFromEntry:Number(formData.distanceFromEntry) || 0,
       length: formData.length,
       deviationAngle: formData.deviationAngle,
       widthDimensions: formData.widthDimensions,

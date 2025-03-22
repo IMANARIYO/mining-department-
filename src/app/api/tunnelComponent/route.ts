@@ -3,15 +3,15 @@ import { NextRequest } from "next/server";
 import {prisma} from "@/lib/prisma";
 import Response from "@/lib/Response";
 export async function GET(req: NextRequest) {
- const { tunnelId } = await req.json();
+//  const { tunnelId } = await req.json();
 
-  if (!tunnelId) {
-    return Response.error(400, "Validation Error", "Tunnel ID is required");
-  }
+  // if (!tunnelId) {
+  //   return Response.error(400, "Validation Error", "Tunnel ID is required");
+  // }
 
   try {
     const tunnelComponents = await prisma.tunnelComponent.findMany({
-      where: { tunnelId },
+      // where: { tunnelId },
       include: { tunnel: true }
     });
 

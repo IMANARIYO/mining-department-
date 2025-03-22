@@ -5,6 +5,7 @@ import {
   Select,
 
 } from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -12,32 +13,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle, CheckCircle } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
-
-import { Textarea } from "@/components/ui/textarea";
-
-
-
-
 
 
 import FilterBar from "./minesTunnelsFilterBar";
-// import SiteForm from "./siteManagement/SiteForm";
-import IncidentReportForm from "./IncidentReportForm";
+
+
 import TunnelDimensionTabs from "./TunnelDimensionTabs";
 
-import BlastingForm from "../blasting/page";
+import BlastingForm from "../blasting/BlastingForm";
 import SitesPage from "./sites/page";
 import {TunnelAdvancementPage} from "./tunnel-advancement/page";
+import { useSiteStore } from "@/siteStore";
+import { IncidentReportPage } from "./incident-report/page";
+import BlastLogPage from "../blasting/page";
+import { ProductionReportPage } from "./productionReport/page";
 
 const TunnelManagementSystem = () => {
+  const { mineSites, fetchSitesData, loading } = useSiteStore();
+
+  useEffect(() => {
+    fetchSitesData();
+  }, []);
+
   const [filters, setFilters] = useState({
     selectedMineSite: null as { id: string; name: string } | null,
     selectedTunnel: null as { id: string; name: string } | null,
@@ -71,12 +68,8 @@ const TunnelManagementSystem = () => {
       present: false
     }
   ]);
-  const [mineSites, setMineSites] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [tunnels, setTunnels] = useState<{ value: string; label: string }[]>(
-    []
-  );
+
+
   const [equipmentData, setEquipmentData] = useState([
     {
       id: "1",
@@ -95,8 +88,7 @@ const TunnelManagementSystem = () => {
       present: false
     }
   ]);
-  const [selectedMineSite, setSelectedMineSite] = useState<string | null>(null);
-  const [selectedTunnel, setSelectedTunnel] = useState<string | null>(null);
+
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -112,21 +104,12 @@ const TunnelManagementSystem = () => {
     }
   }, [ filters.selectedTunnel]);
 
+
   const handleFormSubmitSuccess = () => {
     console.log("Tunnel dimension created successfully!");
   };
 
 
-  const [comments, setComments] = useState("");
-
-
-
-  const shifts = [
-    { value: "day", label: "Day Shift" },
-    { value: "night", label: "Night Shift" }
-  ];
-
-   
   const togglePresence = (id: string, type: "manpower" | "equipment") => {
     if (type === "manpower") {
       setManpowerData((prev) =>
@@ -283,7 +266,8 @@ const TunnelManagementSystem = () => {
         </div>
       </div>
       <FilterBar onFilterChange={setFilters} />
-      <Tabs defaultValue="site-info" className="w-full">
+
+      <Tabs defaultValue="site-info">
         <TabsList className="grid w-full grid-cols-1  sm:grid-cols-4 md:grid-cols-6 h-full gap-2">
           {tabs.map((tab) => (
             <TabsTrigger
@@ -330,7 +314,7 @@ const TunnelManagementSystem = () => {
           />
         </TabsContent>
         <TabsContent value="production">
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Production Report</CardTitle>
             </CardHeader>
@@ -347,7 +331,8 @@ const TunnelManagementSystem = () => {
               </div>
               <Button className="w-full">GENERATE TAG</Button>
             </CardContent>
-          </Card>
+          </Card> */}
+          <ProductionReportPage tunnelId={tunnelId || ""} />
         </TabsContent>
         {/* Tunnel Advancements Tab Content */}
         <TabsContent value="tunnel-advancements">
@@ -356,12 +341,7 @@ const TunnelManagementSystem = () => {
               <CardTitle>Tunnel Advancements</CardTitle>
             </CardHeader>
             <CardContent>
-           
-           
-    <TunnelAdvancementPage
-      tunnelId={tunnelId || ""}
-    />
-           
+              <TunnelAdvancementPage tunnelId={tunnelId || ""} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -372,12 +352,13 @@ const TunnelManagementSystem = () => {
               <CardTitle>Blast Log Detail</CardTitle>
             </CardHeader>
             <CardContent>
-              <BlastingForm
+              {/* <BlastingForm
                 tunnelId={tunnelId || ""}
                 onSubmitSuccess={handleFormSubmitSuccess}
-              />
+              /> */}
+              <BlastLogPage tunnelId={tunnelId || ""} />
 
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <h3 className="text-lg font-medium mb-4">
                   Recent Blast Records
                 </h3>
@@ -425,32 +406,12 @@ const TunnelManagementSystem = () => {
                     </TableBody>
                   </Table>
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="report">
-          <IncidentReportForm
-            tunnelId={tunnelId || ""}
-            onSubmitSuccess={handleFormSubmitSuccess}
-          />
-
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="text-lg">Additional Comments</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                className="min-h-[200px]"
-                placeholder="Enter additional comments..."
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-              />
-              <Button variant="outline" className="ml-auto">
-                Save
-              </Button>
-            </CardContent>
-          </Card>
+          <IncidentReportPage tunnelId={tunnelId || ""} />
         </TabsContent>
       </Tabs>
     </div>

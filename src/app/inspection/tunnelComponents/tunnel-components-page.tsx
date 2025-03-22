@@ -1,40 +1,44 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import { Button } from "@/components/ui/button";
 import { PlusCircle, X } from "lucide-react";
+
 import { toast } from "sonner";
 import { DataTable } from "@/components/tablesUtils/data-table";
+import TunnelComponentForm from "./TunnelComponentForm";
+import { type TunnelComponent, columns } from "./tunnel-components-columns";
+import { getTunnelComponents } from "@/services/tunnelComponentService";
 
-import { type BlastLog, columns } from "./blast-log-columns";
-import { getBlastLogs } from "@/services/blastService";
-import BlastingForm from "./BlastingForm";
-
-
-interface BlastLogPageProps {
+interface TunnelComponentsPageProps {
   tunnelId: string;
 }
 
-export default function BlastLogPage({ tunnelId }: BlastLogPageProps) {
-  const [data, setData] = useState<BlastLog[]>([]);
+export default function TunnelComponentsPage({
+  tunnelId
+}: TunnelComponentsPageProps) {
+  const [data, setData] = useState<TunnelComponent[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
-  // Fetch blast logs data
-  const fetchBlastLogsData = async () => {
+  // Fetch tunnel components data
+  const fetchTunnelComponentsData = async () => {
     try {
       setLoading(true);
-      const result = await getBlastLogs();
+      const result = await getTunnelComponents();
 
-      // Filter logs for the current tunnel if tunnelId is provided
+      // Filter components for the current tunnel if tunnelId is provided
       const filteredData = tunnelId
-        ? result.data.filter((log: BlastLog) => log.tunnelId === tunnelId)
+        ? result.data.filter(
+            (comp: TunnelComponent) => comp.tunnelId === tunnelId
+          )
         : result.data;
 
       setData(filteredData || []);
     } catch (error) {
-      console.error("Error fetching blast logs:", error);
-      toast.error("Failed to load blast logs");
+      console.error("Error fetching tunnel components:", error);
+      toast.error("Failed to load tunnel components");
     } finally {
       setLoading(false);
     }
@@ -42,13 +46,13 @@ export default function BlastLogPage({ tunnelId }: BlastLogPageProps) {
 
   useEffect(() => {
     if (tunnelId) {
-      fetchBlastLogsData();
+      fetchTunnelComponentsData();
     }
   }, [tunnelId]);
 
   const handleSuccess = () => {
     // Refresh data after changes
-    fetchBlastLogsData();
+    fetchTunnelComponentsData();
     // Hide the form after successful submission
     setShowForm(false);
   };
@@ -56,7 +60,7 @@ export default function BlastLogPage({ tunnelId }: BlastLogPageProps) {
   if (!tunnelId) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p>Please select a tunnel to view blast logs</p>
+        <p>Please select a tunnel to view components</p>
       </div>
     );
   }
@@ -64,11 +68,11 @@ export default function BlastLogPage({ tunnelId }: BlastLogPageProps) {
   return (
     <div className="container w-full overflow-x-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Blast Logs</h1>
+        <h1 className="text-2xl font-bold">Tunnel Components</h1>
         {!showForm && (
           <Button onClick={() => setShowForm(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            Add Blast Log
+            Add component
           </Button>
         )}
         {showForm && (
@@ -81,17 +85,20 @@ export default function BlastLogPage({ tunnelId }: BlastLogPageProps) {
 
       {showForm && (
         <div className="mb-8 p-6 border rounded-lg bg-muted/40">
-          <BlastingForm tunnelId={tunnelId} onSubmitSuccess={handleSuccess} />
+          <TunnelComponentForm
+            tunnelId={tunnelId}
+            onSubmitSuccess={handleSuccess}
+          />
         </div>
       )}
 
       <div className="w-full overflow-x-auto">
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p>Loading blast logs...</p>
+            <p>Loading components...</p>
           </div>
         ) : (
-          <DataTable columns={columns(fetchBlastLogsData)} data={data} />
+          <DataTable columns={columns} data={data} />
         )}
       </div>
     </div>

@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div>
+    <div className="w-full overflow-x-auto ">
       <div className="flex items-center justify-between py-4 gap-2">
         <div className="relative max-w-sm">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />

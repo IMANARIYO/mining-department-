@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
+import Response from "@/lib/Response";
 
 // ✅ GET ALL USERS
 export async function GET(req: NextRequest) {
@@ -19,11 +20,12 @@ export async function GET(req: NextRequest) {
       roles: user.roles.map((userRole) => userRole.role),
     }));
 
-    return NextResponse.json({ users: formattedUsers }, { status: 200 });
+    return Response.success(200, formattedUsers, "Users fetched successfully");
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch users", message: (error as Error).message },
-      { status: 500 }
+    return Response.error(
+      500,
+      "Failed to fetch users",
+      (error as Error).message
     );
   }
 }

@@ -18,13 +18,40 @@ export async function POST(req: NextRequest) {
       return Response.error(404, "Tunnel not found", "Invalid tunnel ID");
     }
 
+    // Create the incident report
     const incidentReport = await prisma.incidentReport.create({
-      data: { ...data }
+      data: {
+        tunnelId: data.tunnelId,
+        incidentType: data.incidentType,
+        peopleInvolved: data.peopleInvolved,
+        rootCauseAnalysis: data.rootCauseAnalysis,
+        measuresTaken: data.measuresTaken
+      }
     });
+
+    // If a comment is provided, create it and link it to the incident report
+    let comment = null;
+    if (data.comment) {
+      if (!data.userId) {
+        return Response.error(
+          400,
+          "Missing userId",
+          "User ID is required for a comment"
+        );
+      }
+
+      comment = await prisma.comment.create({
+        data: {
+          content: data.comment,
+          userId: data.userId,
+          incidentReportId: incidentReport.id
+        }
+      });
+    }
 
     return Response.success(
       201,
-      incidentReport,
+      { incidentReport, comment },
       "Incident Report created successfully"
     );
   } catch (error) {
@@ -35,6 +62,7 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 
 export async function GET() {
   try {
