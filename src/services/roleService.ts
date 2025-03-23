@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/api";
 
-const ROLE_API_URL = "/role";
+const ROLE_API_URL = "/roles";
 
 // ✅ Create Role
 export const createRole = async (roleData: { name: string }) => {

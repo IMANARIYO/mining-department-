@@ -56,16 +56,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Format roles to include only relevant user details
-    const formattedRoles = roles.map((role) => ({
-      id: role.id,
-      name: role.name,
-      users: role.users.map((userRole) => userRole.user), // Extract users for each role
-    }));
+
 
     return Response.success(
       200,
-      formattedRoles,
+      roles,
       "Roles retrieved successfully"
     );
   } catch (error) {

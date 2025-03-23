@@ -9,7 +9,7 @@ export const createUser = async (userData: {
   password: string;
 }) => {
   try {
-    const response = await axiosInstance.post(USER_API_URL, userData);
+    const response = await axiosInstance.post("/register", userData);
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.message || "Error creating user";
@@ -71,12 +71,71 @@ export const deleteUser = async (userId: string) => {
 };
 
 // ✅ Check Users by Role ID
-export const getUsersByRoleId = async (roleId: string) => {
+export const getUsersWithRoleId = async (roleId: string) => {
   try {
     const response = await axiosInstance.get(`/role/${roleId}`);
     return response.data;  // This will be the list of users with the specified role
   } catch (error: any) {
     const message = error.response?.data?.message || "Error checking users by role";
     throw { error: "Failed to check users by role", message };
+  }
+};
+// ✅ Get User Roles by ID (New)
+export const getRolesForUserId = async (userId: string) => {
+  console.log("getting roles  for this  user",userId)
+  try {
+    const response = await axiosInstance.get(`${USER_API_URL}/${userId}/role`);
+    console.log("the roles  for this  user",response.data)
+    return response.data;
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || `Error fetching roles for user with ID: ${userId}`;
+    throw { error: "Failed to fetch user roles", message };
+  }
+};
+
+
+// ✅ Add Roles to User
+export const addRolesToUser = async (userId: string, roleIds: string[]) => {
+  try {
+    const response = await axiosInstance.post("/user/role", {
+      userId,
+      roleIds
+    });
+    console.log("the rolke  to add  are  the---------------------------------------------------------------",response.data)
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || "Error adding roles to user";
+    throw { error: "Failed to add roles to user", message };
+  }
+};
+
+// ✅ Remove Roles from User
+export const removeRolesFromUser = async (userId: string, roleIds: string[]) => {
+  try {
+    const response = await axiosInstance.delete("/user/role", {
+      data: {
+        userId,
+        roleIds
+      }
+    });
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || "Error removing roles from user";
+    throw { error: "Failed to remove roles from user", message };
+  }
+};
+
+// ✅ Update Roles for User
+export const updateUserRoles = async (userId: string, newRoleIds: string[]) => {
+  try {
+    const response = await axiosInstance.patch("/user/role", {
+      userId,
+      newRoleIds
+    });
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || "Error updating roles for user";
+    throw { error: "Failed to update roles for user", message };
   }
 };
