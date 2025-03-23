@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
 
     let whereClause: any = {};
 
-    // Date range filter
     if (startDate) {
       const start = new Date(startDate);
       whereClause.date = {
@@ -25,21 +24,19 @@ export async function GET(req: NextRequest) {
 
     if (endDate) {
       const end = new Date(endDate);
-      end.setDate(end.getDate() + 1); // Include the end date
+      end.setDate(end.getDate() + 1); 
       whereClause.date = {
         ...(whereClause.date || {}),
         lt: end,
       };
     }
 
-    // Tunnel filter
     if (tunnelId) {
       whereClause.manpower = {
         tunnelId,
       };
     }
 
-    // Get all attendance records with the filters
     const attendanceRecords = await prisma.attendance.findMany({
       where: whereClause,
       include: {
@@ -68,7 +65,6 @@ export async function GET(req: NextRequest) {
 
     switch (reportType) {
       case "daily":
-        // Group by date
         reportData = attendanceRecords.reduce((acc, record) => {
           const dateStr = record.date.toISOString().split("T")[0];
 
@@ -82,13 +78,12 @@ export async function GET(req: NextRequest) {
         break;
 
       case "weekly":
-        // Group by week
         reportData = attendanceRecords.reduce((acc, record) => {
           const date = new Date(record.date);
           const weekStart = new Date(date);
-          weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
+          weekStart.setDate(date.getDate() - date.getDay());
           const weekEnd = new Date(weekStart);
-          weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+          weekEnd.setDate(weekStart.getDate() + 6); 
 
           const weekKey = `${weekStart.toISOString().split("T")[0]} to ${
             weekEnd.toISOString().split("T")[0]
@@ -104,7 +99,6 @@ export async function GET(req: NextRequest) {
         break;
 
       case "monthly":
-        // Group by month
         reportData = attendanceRecords.reduce((acc, record) => {
           const date = new Date(record.date);
           const monthYear = `${date.getFullYear()}-${String(
@@ -121,7 +115,6 @@ export async function GET(req: NextRequest) {
         break;
 
       case "worker":
-        // Group by worker
         reportData = attendanceRecords.reduce((acc, record) => {
           const workerId = record.manpower.id;
           const workerName = record.manpower.name;
@@ -140,7 +133,6 @@ export async function GET(req: NextRequest) {
         reportData = attendanceRecords;
     }
 
-    // Calculate summary statistics
     const summary = {
       totalRecords: attendanceRecords.length,
       totalWorkers: new Set(attendanceRecords.map((r) => r.manpowerId)).size,
