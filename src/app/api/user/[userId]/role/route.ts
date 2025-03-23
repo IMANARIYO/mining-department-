@@ -1,32 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Response from "@/lib/Response";
 
 // ✅ GET ROLES FOR USER BY USER ID
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
-) {
-  const { userId } = params;
-
+export async function GET(req: NextRequest, context: { params: { userId: string } }) {
+  console.log("yes  i confirm it me  being  executed  for just  retrieving  user  dta")
+  const { userId } = await Promise.resolve(context.params);
   try {
     // Fetch user with their roles
     const userWithRoles = await prisma.user.findUnique({
       where: { id: userId },
-      include: { roles: { include: { role: true } } }, // Include the role details
+      include: { roles: { include: { role: true } } } // Include the role details
     });
 
     if (!userWithRoles) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return Response.error(
+        404,
+        "User not found",
+        "The user with the provided ID does not exist."
+      );
     }
 
-    return NextResponse.json({ roles: userWithRoles.roles }, { status: 200 });
+    return Response.success(
+      200,
+      userWithRoles.roles,
+      "User roles fetched successfully"
+    );
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: "Failed to fetch user roles",
-        message: (error as Error).message,
-      },
-      { status: 500 }
+    return Response.error(
+      500,
+      "Failed to fetch user roles",
+      (error as Error).message
     );
   }
 }

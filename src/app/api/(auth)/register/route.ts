@@ -1,5 +1,5 @@
 // Use the correct Prisma client import
-import MyPrismaClient from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     // Check if the user already exists
-    const existingUser = await MyPrismaClient.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the user in the database
-    const user = await MyPrismaClient.user.create({
+    const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -45,18 +45,19 @@ export async function POST(req: Request) {
     });
 
     // Generate JWT token
-   const token = jwt.sign(
-        { userId: user.id},
-        JWT_SECRET as jwt.Secret,
-       {
-             expiresIn: process.env.JWT_EXPIRATION || "1h" 
-           } as jwt.SignOptions);
+    const token = jwt.sign(
+      { userId: user.id },
+      JWT_SECRET as jwt.Secret,
+      {
+        expiresIn: process.env.JWT_EXPIRATION || "1h"
+      } as jwt.SignOptions
+    );
     return NextResponse.json(
       {
         user: {
           id: user.id,
           email: user.email,
-      
+
           name: user.name || "",
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString()

@@ -1,5 +1,5 @@
 
-import MyPrismaClient from "@/lib/prisma";
+import {prisma} from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     }
 
     // Find user in the database
-    const user = await MyPrismaClient.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       return NextResponse.json(
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id },
       JWT_SECRET as jwt.Secret,
      {
            expiresIn: process.env.JWT_EXPIRATION || "1h" 
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role
+        
         },
         token
       },

@@ -28,7 +28,8 @@ import { useTheme } from "next-themes";
 const menuItems = [
   { title: "Performance", url: "/", icon: "⭕" },
   { title: "Production", url: "/production", icon: "🔺" },
-  { title: "users", url: "/user", icon: <User/> },
+  { title: "users", url: "/users", icon: <User/> },
+  
   { title: "Inspection", url: "/inspection", icon: "▣" },
   { title: "RFD", url: "/rfd", icon: "☑" },
   { title: "Reports", url: "reports", icon: "↻" },
