@@ -218,12 +218,12 @@ model Manpower {
   name             String
   role             String
   location         String
-  warning          Warning?
+  warning          Warning[]
   tunnelId         String
   tunnel           Tunnel          @relation(fields: [tunnelId], references: [id])
   siteInspectionId String?
   siteInspection   SiteInspection? @relation(fields: [siteInspectionId], references: [id])
-  attendances      Attendance[]    // Add this line
+  attendances      Attendance[]    
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @default(now()) @updatedAt
 }
