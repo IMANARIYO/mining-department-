@@ -1,7 +1,5 @@
 "use client";
-
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSidebar } from "@/components/ui/sidebar";
 import sidebarLogo from "../../public/sidebar-logo.svg";
 import Link from "next/link";
@@ -23,6 +21,7 @@ import {
 import { ChevronLeft, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 // Define types for menu items
 type MenuItem = {
@@ -59,12 +58,13 @@ export function SidebarMenuComponent({
             {/* Logo and Toggle Button */}
             <div className="flex items-center justify-between mb-6 p-2">
               <div className="flex items-center gap-2">
-                <img
-                  src={sidebarLogo.src}
+
+                <Image
+                  src="/sidebar-logo.svg"
                   alt="Company Logo"
-                  className={`transition-all duration-300 bg-[#a17d55] w-${
-                    isCollapsed === "expanded" ? "8" : "10"
-                  }`}
+                  width={isCollapsed === "expanded" ? 32 : 40} // Adjust sizes based on state
+                  height={isCollapsed === "expanded" ? 32 : 40}
+                  className="transition-all duration-300 bg-[#a17d55]"
                 />
                 {isCollapsed === "expanded" && (
                   <div className="text-[#a17d55] font-bold text-lg">
