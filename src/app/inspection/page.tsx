@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle, CheckCircle } from "lucide-react";
-import FilterBar from "./minesTunnelsFilterBar";
+import FilterBar from "../../components/minesTunnelsFilterBar";
 import TunnelDimensionTabs from "./TunnelDimensionTabs"
 import SitesPage from "./sites/page";
 import { TunnelAdvancementPage } from "./tunnel-advancement/page";
@@ -209,7 +209,7 @@ const TunnelManagementSystem = () => {
       </Card>
     );
   };
-  const [activeTab, setActiveTab] = useState("site-info");
+
 
   const tabs = [
     { value: "site-info", label: "Site Informations" },

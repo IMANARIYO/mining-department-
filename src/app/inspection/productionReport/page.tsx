@@ -27,10 +27,10 @@ interface ProductionReportPageProps {
 export const ProductionReportPage: React.FC<ProductionReportPageProps> = ({
   tunnelId
 }) => {
-  const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-
+  
+  const [reports, setReports] = useState([]);
   // Load data function
   const loadData = async () => {
     setIsLoading(true);

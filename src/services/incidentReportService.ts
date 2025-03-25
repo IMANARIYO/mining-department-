@@ -29,3 +29,9 @@ export const deleteIncidentReport = async (id: string) => {
   const res = await axiosInstance.delete(`/incidentReport/${id}`);
   return res.data;
 };
+
+// Get all Incident Reports for a given Tunnel ID
+export const getIncidentsByTunnelId = async (tunnelId: string) => {
+  const res = await axiosInstance.get(`/incidentReport/tunnel/${tunnelId}`); // Fetch incidents for a specific tunnelId
+  return res.data;
+};

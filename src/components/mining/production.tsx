@@ -11,36 +11,16 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDown, Printer } from "lucide-react";
 import { format } from "date-fns";
+import { DataTable } from "../tablesUtils/data-table";
 
-export function ProductionReport() {
+interface ProductionReportProps {
+  columns: any[];
+  data: any[];
+}
+
+export function ProductionReport({ columns, data }: ProductionReportProps) {
   const [date, setDate] = useState<Date>(new Date());
 
-  const productionData = [
-    {
-      dailyPlan: "567 Meters",
-      bookedMeter: "567 Meters",
-      actualMeter: "1000 Meters",
-      variance: "------",
-      materialExcavated: "Pumps",
-      wasteExcavated: "189 Kg",
-    },
-    {
-      dailyPlan: "567 Meters",
-      bookedMeter: "567 Meters",
-      actualMeter: "1000 Meters",
-      variance: "------",
-      materialExcavated: "Pumps",
-      wasteExcavated: "189 Kg",
-    },
-    {
-      dailyPlan: "567 Meters",
-      bookedMeter: "567 Meters",
-      actualMeter: "1000 Meters",
-      variance: "------",
-      materialExcavated: "Pumps",
-      wasteExcavated: "189 Kg",
-    },
-  ];
 
   return (
     <Card className="bg-white shadow-sm p-6">
@@ -54,8 +34,7 @@ export function ProductionReport() {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="border-gray-300 text-gray-700 px-3 py-2 h-auto"
-              >
+                className="border-gray-300 text-gray-700 px-3 py-2 h-auto">
                 <span className="mr-2">{format(date, "dd MMMM yyyy")}</span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -71,33 +50,7 @@ export function ProductionReport() {
           </Popover>
         </div>
       </div>
-
-      {/* Table Header */}
-      <div className="grid grid-cols-6 gap-4 mb-4 text-sm font-medium text-gray-600">
-        <div className="text-center">Daily Production Plan</div>
-        <div className="text-center">Booked Meter</div>
-        <div className="text-center">Actual Meter</div>
-        <div className="text-center">Variance</div>
-        <div className="text-center">Material Excavated</div>
-        <div className="text-center">Waste Excavated</div>
-      </div>
-
-      {/* Table Data */}
-      <div className="space-y-4">
-        {productionData.map((row, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-6 gap-4 py-4 border-b border-gray-100 last:border-0 text-sm"
-          >
-            <div className="text-center">{row.dailyPlan}</div>
-            <div className="text-center">{row.bookedMeter}</div>
-            <div className="text-center">{row.actualMeter}</div>
-            <div className="text-center">{row.variance}</div>
-            <div className="text-center">{row.materialExcavated}</div>
-            <div className="text-center">{row.wasteExcavated}</div>
-          </div>
-        ))}
-      </div>
+      <DataTable columns={columns} data={data} />
 
       {/* Bottom Actions */}
       <div className="flex justify-end mt-8 gap-4">

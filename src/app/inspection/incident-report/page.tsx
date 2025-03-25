@@ -12,7 +12,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, X } from "lucide-react";
 
-import { getAllIncidentReports } from "@/services/incidentReportService";
+import {
+  getIncidentsByTunnelId,
+  getAllIncidentReports
+} from "@/services/incidentReportService";
 import { toast } from "sonner";
 import { getColumns } from "./incident-report-columns";
 import { DataTable } from "@/components/tablesUtils/data-table";
@@ -20,10 +23,12 @@ import IncidentReportForm from "./IncidentReportForm";
 
 interface IncidentReportPageProps {
   tunnelId: string;
+  fetchAllReports?: boolean; // Optional prop to decide whether to fetch all reports
 }
 
 export const IncidentReportPage: React.FC<IncidentReportPageProps> = ({
-  tunnelId
+  tunnelId,
+  fetchAllReports = false // Default to fetching only the reports for the given tunnel
 }) => {
   const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,8 +38,16 @@ export const IncidentReportPage: React.FC<IncidentReportPageProps> = ({
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const reportData = await getAllIncidentReports();
-      setReports(reportData.data);
+      let reportData;
+
+      // If fetchAllReports is true, fetch all reports, otherwise fetch only for the specific tunnel
+      if (fetchAllReports) {
+        reportData = await getAllIncidentReports();
+      } else {
+        reportData = await getIncidentsByTunnelId(tunnelId);
+      }
+
+      setReports(reportData.data); // Assume the response is an array of reports
     } catch (error) {
       console.error("Failed to load data:", error);
       toast.error("Failed to load incident reports");
@@ -49,11 +62,8 @@ export const IncidentReportPage: React.FC<IncidentReportPageProps> = ({
   };
 
   useEffect(() => {
-    // Fetch data only once when the component is first mounted
-    if (reports.length === 0) {
-      loadData();
-    }
-  }, []); // Empty dependency array ensures it only runs once when the component mounts.
+    loadData();
+  }, [tunnelId, fetchAllReports]); // Refetch when tunnelId or fetchAllReports changes
 
   // Handle form submission success internally
   const handleFormSuccess = () => {

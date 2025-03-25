@@ -79,3 +79,20 @@ export const deleteProductionReport = async (reportId: string) => {
     throw { error: "Failed to delete production report", message: message };
   }
 };
+// Get Production Reports for a Specific Tunnel
+export const getProductionReportsByTunnel = async (tunnelId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${PRODUCTION_REPORT_API_URL}/tunnel/${tunnelId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message ||
+      `Error fetching production reports for tunnel ID: ${tunnelId}`;
+    throw {
+      error: "Failed to fetch production reports",
+      message: message,
+    };
+  }
+};
