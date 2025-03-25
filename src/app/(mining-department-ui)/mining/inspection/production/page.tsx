@@ -8,9 +8,9 @@ import FilterBar from "@/components/minesTunnelsFilterBar";
 import { useSiteStore } from "@/siteStore";
 import { toast } from "sonner";
 import { getProductionReportsByTunnel } from "@/services/productionReportService";
-import { productionReportcolumns } from "../inspection/productionReport/productionReportColumns";
-import { DataTable } from "@/components/tablesUtils/data-table";
-import { IncidentReportPage } from "../inspection/incident-report/page";
+import { productionReportcolumns } from "../productionReport/productionReportColumns";
+import { IncidentReportPage } from "../incident-report/page";
+
 
 export default function ProductionPage() {
   const { fetchSitesData } = useSiteStore();
