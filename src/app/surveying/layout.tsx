@@ -6,7 +6,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Header } from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { MiningDepartmentNavigationMenu } from "@/components/sideBars/mining-department-navigationmenu";
+import { SurveyingNavigationMenu } from "@/components/sideBars/surveying-department-navigationmenu";
+
 
 
 
@@ -41,7 +42,7 @@ export default function Layout({
           disableTransitionOnChange>
           <SidebarProvider>
             <div className="flex flex-row h-full w-[100vw]">
-              <MiningDepartmentNavigationMenu />
+              <SurveyingNavigationMenu />
               <div className="flex flex-col flex-1 ">
                 <Header />
                 <div className="children  p-4 overflow-auto">

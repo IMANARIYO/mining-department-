@@ -5,6 +5,13 @@ import { Bell, ChevronDown, ChevronLeft, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSidebar } from "@/components/ui/sidebar"; // ✅ Import useSidebar
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+
 
 export function Header() {
   const { toggleSidebar } = useSidebar(); // ✅ Sidebar Toggle Function
@@ -24,8 +31,6 @@ export function Header() {
           <Menu size={20} />
         </Button>
 
-   
-
         {/* Admin Console & Search (Hidden on Small Screens) */}
         <div className="hidden md:flex items-center gap-2">
           <Button variant="outline" size="sm" className="ml-4">
@@ -44,22 +49,32 @@ export function Header() {
         <Button variant="ghost" size="icon">
           <Bell size={20} />
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2 px-4 p-4 rounded-full border">
+              {/* User Details (Hidden on Small Screens) */}
+              <div className="hidden md:block text-right text-sm mr-1">
+                <div className="font-medium">Kelvin R.</div>
+                <div className="text-gray-500 text-xs">Managing Director</div>
+              </div>
 
-        {/* User Info */}
-        <div className="flex items-center gap-2">
-          {/* User Details (Hidden on Small Screens) */}
-          <div className="hidden md:block text-right text-sm mr-1">
-            <div className="font-medium">Kelvin R.</div>
-            <div className="text-gray-500 text-xs">Managing Director</div>
-          </div>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>KR</AvatarFallback>
+              </Avatar>
+              <ChevronDown size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          {/* Avatar */}
-          <Avatar className="border-2 border-amber-600">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>KR</AvatarFallback>
-          </Avatar>
-          <ChevronDown size={16} />
-        </div>
+
       </div>
     </header>
   );
