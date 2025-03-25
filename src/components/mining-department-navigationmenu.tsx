@@ -90,7 +90,7 @@ export function NavigationMenu() {
                     <Tooltip>
                       <SidebarMenuButton asChild>
                         <Link
-                          href={item.url}
+                          href={`/mining/${item.url}`}
                           onClick={() => setActiveTab(item.title)}
                           className={`flex items-center transition-all duration-300 relative my-2 py-4 rounded-lg
                             ${
