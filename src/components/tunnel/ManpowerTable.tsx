@@ -51,8 +51,8 @@ const ManpowerTable: React.FC<ManpowerTableProps> = ({
   ];
 
   return (
-    <DataTable
-      title="Roll Call Manpower on Site"
+    <DataTable 
+      title="Roll Call Manpower on Site "
       columns={columns}
       rows={data}
       onAddClick={onAddClick}

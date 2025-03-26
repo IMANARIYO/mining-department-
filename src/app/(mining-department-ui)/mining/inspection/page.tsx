@@ -18,6 +18,7 @@ import { IncidentReportPage } from "./incident-report/page";
 import { ProductionReportPage } from "./productionReport/page";
 import FilterBar from "@/components/minesTunnelsFilterBar";
 import BlastLogPage from "../blasting/page";
+import { ManpowerPage } from "./manpower/page";
 
 const TunnelManagementSystem = () => {
   const { fetchSitesData, loading } = useSiteStore();
@@ -261,7 +262,8 @@ const TunnelManagementSystem = () => {
   px-1 sm:px-2 md:px-4 
   py-1 sm:py-2 
   whitespace-normal h-auto min-h-10
-  text-center">
+  text-center"
+            >
               {tab.label}
             </TabsTrigger>
           ))}
@@ -276,11 +278,12 @@ const TunnelManagementSystem = () => {
               <CardTitle>Site Inspection</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 max-w-[100%] h-full">
-              <DataTable
+              {/* <DataTable
                 title="Roll Call Manpower on Site"
                 columns={manpowerColumns}
                 rows={manpowerData}
-              />
+              /> */}
+              <ManpowerPage tunnelId={tunnelId || ""} />
               <DataTable
                 title="Equipments"
                 columns={equipmentColumns}
