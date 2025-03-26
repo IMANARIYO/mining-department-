@@ -4,7 +4,7 @@ import { SidebarMenuComponent } from "./SidebarMenu";
 const surveyingMenuItems = [
   { title: "Dashboard", url: "/", icon: <LayoutDashboard /> },
   { title: "new sample", url: "/datahub", icon: <LayoutDashboard /> },
-//   { title: "Work Force", url: "/workForce", icon: <LayoutDashboard /> },
+  { title: "samples", url: "/samples", icon: <LayoutDashboard /> },
   { title: "Analytics", url: "/analysis", icon: <LayoutDashboard /> }
 ];
 

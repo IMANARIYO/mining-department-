@@ -37,22 +37,7 @@ const MinelabDashboard = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">MineLab Data Hub</h1>
-        <div className="flex gap-4">
-          <div className="w-6 h-6">🔔</div>
-          <div className="w-6 h-6">👤</div>
-        </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="flex gap-6 border-b pb-2">
-        <span className="font-medium">Dashboard</span>
-        <span className="text-gray-600">Samples</span>
-        <span className="text-gray-600">Reports</span>
-        <span className="text-gray-600">Analysis</span>
-      </div>
 
       {/* Quick Actions */}
       <Card>

@@ -73,7 +73,57 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
+      <header className="p-4 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-md bg-[#8B6D4B] px-4 py-2 text-white">
+              <span>Laboratory</span>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-md bg-[#8B6D4B] text-white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <span className="sr-only">Search</span>
+            </Button>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" className="rounded-full">
+              <Bell className="h-4 w-4" />
+              <span className="sr-only">Notifications</span>
+            </Button>
+            <div className="flex items-center gap-2 rounded-full border px-2 py-1 pr-4 bg-gray-100">
+              <ChevronDown className="h-4 w-4" />
+              <div className="flex flex-col text-sm">
+                <span className="font-medium">Kelvin R.</span>
+                <span className="text-xs text-muted-foreground">
+                  Managing Director
+                </span>
+              </div>
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src="/placeholder.svg?height=32&width=32"
+                  alt="User"
+                />
+                <AvatarFallback>KR</AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <main className="mx-auto max-w-7xl p-4">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

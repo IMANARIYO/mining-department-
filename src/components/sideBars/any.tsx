@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSidebar } from "@/components/ui/sidebar";
 import sidebarLogo from "../../public/sidebar-logo.svg";
 import Link from "next/link";
@@ -18,59 +20,58 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from "@/components/ui/sidebar";
-import { ChevronLeft, Moon, Sun } from "lucide-react";
+import { ChevronLeft, Moon, Sun, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 
-// Define types for menu items
-type MenuItem = {
-  title: string;
-  url: string;
-  icon: React.ReactNode;
-};
+// Menu items array
+const menuItems = [
+  { title: "Performance", url: "/", icon: "⭕" },
+  { title: "Production", url: "/production", icon: "🔺" },
+  { title: "users", url: "/user", icon: <User /> },
+  { title: "Inspection", url: "/inspection", icon: "▣" },
+  { title: "RFD", url: "/rfd", icon: "☑" },
+  { title: "Reports", url: "reports", icon: "↻" },
+  { title: "Settings", url: "/", icon: "⚙" }
+];
 
-type SidebarProps = {
-  title: string;
-  basePath: string;
-  menuItems: MenuItem[];
-};
-
-export function SidebarMenuComponent({
-  title,
-  basePath,
-  menuItems
-}: SidebarProps) {
-  const [activeTab, setActiveTab] = useState(menuItems[0]?.title || "");
-  const { toggleSidebar, state: isCollapsed } = useSidebar();
+export function NavigationMenu() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("Inspection");
+  const { toggleSidebar } = useSidebar();
+  const { state: isCollapsed } = useSidebar();
   const { theme, setTheme } = useTheme();
 
   return (
     <Sidebar
       collapsible="icon"
-      className={`${
-        isCollapsed === "expanded" ? "w-64" : "w-16"
-      } transition-all duration-300 ease-in-out overflow-y-auto h-full`}>
+      className={` 
+        ${isCollapsed === "expanded" ? "w-64" : "w-16"} 
+        transition-all duration-300 ease-in-out overflow-y-auto h-full `}>
       <SidebarContent className="w-full flex flex-col justify-between p-4">
-        {/* Top Section */}
+        {/* Navigation Menu */}
         <SidebarGroup className="bg-[#ece5d8] rounded-lg h-fit max-h-3/4 overflow-y-auto">
           <SidebarGroupContent>
-            {/* Logo and Toggle Button */}
+            {/* Logo and Toggle Button Area */}
             <div className="flex items-center justify-between mb-6 p-2">
+              {/* Logo - Always visible */}
               <div className="flex items-center gap-2">
-                <Image
-                  src="/sidebar-logo.svg"
+                <img
+                  src={sidebarLogo.src}
                   alt="Company Logo"
-                  width={isCollapsed === "expanded" ? 32 : 40} // Adjust sizes based on state
-                  height={isCollapsed === "expanded" ? 32 : 40}
-                  className="transition-all duration-300 bg-[#a17d55]"
+                  className={`text-[#d48326] transition-all duration-300 bg-[#a17d55] w-${
+                    isCollapsed === "expanded" ? "8" : "10"
+                  }`}
                 />
+                {/* Text - Only visible when expanded */}
                 {isCollapsed === "expanded" && (
                   <div className="text-[#a17d55] font-bold text-lg">
-                    {title}
+                    minetech
                   </div>
                 )}
               </div>
+
+              {/* Toggle button - Always visible */}
               <Button
                 onClick={toggleSidebar}
                 variant="ghost"
@@ -79,7 +80,6 @@ export function SidebarMenuComponent({
               </Button>
             </div>
 
-            {/* Menu Items */}
             <SidebarMenu className="bg-[#ece5d8] rounded-lg p-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -87,12 +87,12 @@ export function SidebarMenuComponent({
                     <Tooltip>
                       <SidebarMenuButton asChild>
                         <Link
-                          href={`${basePath}/${item.url}`}
+                          href={item.url}
                           onClick={() => setActiveTab(item.title)}
                           className={`flex items-center transition-all duration-300 relative my-2 py-4 rounded-lg
                             ${
                               activeTab === item.title
-                                ? "bg-[#a17d55] text-white font-medium shadow-lg border border-emerald-500"
+                                ? "bg-[#a17d55] text-white font-medium shadow-lg shadow-emerald-900/30 border border-emerald-500"
                                 : "text-[#5c4731] hover:bg-[#e6dfd2]"
                             }
                             ${
@@ -105,7 +105,9 @@ export function SidebarMenuComponent({
                             <span className="text-lg">{item.icon}</span>
                           </TooltipTrigger>
                           {isCollapsed === "expanded" && (
-                            <span className="ml-3">{item.title}</span>
+                            <span className="ml-3 transition-all duration-300">
+                              {item.title}
+                            </span>
                           )}
                         </Link>
                       </SidebarMenuButton>
@@ -124,7 +126,6 @@ export function SidebarMenuComponent({
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Bottom Section */}
         {/* Bottom Menu with Messages and Theme Toggle */}
         <SidebarGroup className="overflow-y-auto bg-[#ece5d8] rounded-lg p-2 h-fit mt-auto">
           <SidebarGroupContent>
